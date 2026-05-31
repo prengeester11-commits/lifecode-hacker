@@ -2,16 +2,21 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# WeasyPrint와 한글 폰트 시스템 의존성
+# 시스템 의존성: WeasyPrint(GTK) + 한글 폰트 + 빌드 도구(C확장 패키지용)
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    libffi-dev \
+    libssl-dev \
     libpango-1.0-0 \
     libpangoft2-1.0-0 \
     libcairo2 \
     libgdk-pixbuf-2.0-0 \
-    libffi-dev \
     shared-mime-info \
     fonts-noto-cjk \
     fonts-nanum \
+    libjpeg-dev \
+    zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 의존성 먼저 설치 (캐시 최적화)
