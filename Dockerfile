@@ -19,6 +19,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# pip/setuptools 최신화 (metadata-generation-failed 방지)
+RUN pip install --upgrade pip setuptools wheel
+
 # 의존성 먼저 설치 (캐시 최적화)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
