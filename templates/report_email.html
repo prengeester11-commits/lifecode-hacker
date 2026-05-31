@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>{{ name }}님의 사주 무의식 패턴 보고서 — 라이프코드 해커</title>
+<!-- 프리미엄 웹폰트: Pretendard(본문) + Nanum Myeongjo(표지·제목 명조체) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ── 리셋 ── */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0b0b14;
+    color: #dcdce8;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
+                 'Noto Sans KR', sans-serif;
+    font-size: 14.5px;
+    line-height: 1.82;
+    letter-spacing: -0.2px;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* 명조체(serif) 헤딩 — 표지·섹션 제목용 */
+  .serif {
+    font-family: 'Nanum Myeongjo', 'Apple SD Gothic Neo', 'Pretendard', serif;
+  }
+  a { color: #a78bfa; text-decoration: none; }
+
+  /* ── 레이아웃 ── */
+  .wrapper {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 0 40px;
+  }
+
+  /* ── 헤더 ── */
+  .header {
+    background: linear-gradient(135deg, #1a0533 0%, #0d0d2b 50%, #001233 100%);
+    padding: 48px 28px 36px;
+    text-align: center;
+    border-bottom: 1px solid rgba(167,139,250,0.25);
+  }
+  .brand {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #a78bfa;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  .header-title {
+    font-family: 'Nanum Myeongjo', 'Apple SD Gothic Neo', 'Pretendard', serif;
+    font-size: 25px;
+    font-weight: 800;
+    line-height: 1.45;
+    color: #f0ecff;
+    margin-bottom: 8px;
+    letter-spacing: -0.4px;
+  }
+  .header-title span {
+    background: linear-gradient(90deg, #a78bfa, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: #8b8baa;
+    margin-top: 12px;
+  }
+
+  /* ── 서문 (선물 같은 헌사) ── */
+  .preface {
+    text-align: center;
+    padding: 40px 30px 36px;
+  }
+  .preface-rule {
+    width: 44px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e7c66b, transparent);
+    margin: 0 auto;
+  }
+  .preface-mark {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 20px;
+    color: #e7c66b;
+    margin: 18px 0;
+    letter-spacing: 2px;
+  }
+  .preface-text {
+    font-size: 14px;
+    line-height: 2.0;
+    color: #cfc8ea;
+    word-break: keep-all;
+    margin: 18px 0;
+  }
+
+  /* ── 원국 카드 ── */
+  .saju-card {
+    margin: 28px 20px;
+    background: linear-gradient(145deg, #12102a, #0e1428);
+    border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 20px;
+    padding: 24px 20px;
+  }
+  .saju-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #a78bfa;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pillar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .pillar {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(167,139,250,0.15);
+    border-radius: 14px;
+    padding: 14px 8px;
+    text-align: center;
+  }
+  .pillar-label {
+    font-size: 10px;
+    color: #6b6b8a;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+  .pillar-hanja {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    margin: 6px 0 4px;
+  }
+  .pillar-stem, .pillar-branch {
+    display: block;
+    text-shadow: 0 0 12px currentColor;
+  }
+  .pillar-kor {
+    font-size: 11px;
+    color: #8878cc;
+    margin-top: 6px;
+  }
+
+  /* 오행별 글자 색상 (한자 직접 컬러링) */
+  .char-mok  { color: #4ade80; }   /* 木 — 청록 */
+  .char-hwa  { color: #f87171; }   /* 火 — 빨강 */
+  .char-to   { color: #fbbf24; }   /* 土 — 황색 */
+  .char-geum { color: #e5e7eb; }   /* 金 — 백색 */
+  .char-su   { color: #60a5fa; }   /* 水 — 청색 */
+
+  /* 오행 분포 바용 글자색 */
+  .oh-mok  { color: #4ade80; }
+  .oh-hwa  { color: #f87171; }
+  .oh-to   { color: #fbbf24; }
+  .oh-geum { color: #e5e7eb; }
+  .oh-su   { color: #60a5fa; }
+
+  .ilgan-badge {
+    margin-top: 16px;
+    padding: 10px 16px;
+    background: rgba(167,139,250,0.1);
+    border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 10px;
+    font-size: 13px;
+    color: #c4b5fd;
+    text-align: center;
+  }
+
+  /* ── 분석 근거 배지 (계산 투명성 → 신뢰) ── */
+  .evidence-box {
+    margin-top: 14px;
+    padding: 14px 16px 12px;
+    background: rgba(231,198,107,0.06);
+    border: 1px solid rgba(231,198,107,0.22);
+    border-radius: 12px;
+  }
+  .evidence-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    color: #e7c66b;
+    margin-bottom: 9px;
+  }
+  .evidence-box table { border-collapse: collapse; }
+  .ev-k {
+    font-size: 12px;
+    color: #9a93b8;
+    padding: 4px 10px 4px 0;
+    white-space: nowrap;
+    vertical-align: top;
+    width: 84px;
+  }
+  .ev-v {
+    font-size: 12.5px;
+    color: #dcdce8;
+    font-weight: 600;
+    padding: 4px 0;
+    line-height: 1.5;
+  }
+  .ev-v .ev-sub {
+    color: #7d789c;
+    font-weight: 400;
+    font-size: 11px;
+  }
+  .ev-help { color: #ecc65f; }
+  .evidence-foot {
+    margin-top: 9px;
+    font-size: 10.5px;
+    color: #6f6a8e;
+    text-align: center;
+  }
+
+  /* ── 오행 바 ── */
+  .ohaeng-section {
+    margin: 0 20px 28px;
+    background: linear-gradient(145deg, #12102a, #0e1428);
+    border: 1px solid rgba(167,139,250,0.15);
+    border-radius: 20px;
+    padding: 24px 20px;
+  }
+  .ohaeng-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 10px;
+  }
+  .ohaeng-label {
+    width: 28px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .ohaeng-bar-wrap {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border-radius: 99px;
+    height: 8px;
+    overflow: hidden;
+  }
+  .ohaeng-bar {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.8s ease;
+  }
+  .bar-mok  { background: linear-gradient(90deg, #4caf50, #81c784); }
+  .bar-hwa  { background: linear-gradient(90deg, #ff5722, #ff8a65); }
+  .bar-to   { background: linear-gradient(90deg, #ffc107, #ffd54f); }
+  .bar-geum { background: linear-gradient(90deg, #9e9e9e, #bdbdbd); }
+  .bar-su   { background: linear-gradient(90deg, #2196f3, #64b5f6); }
+  .ohaeng-pct {
+    width: 36px;
+    font-size: 12px;
+    color: #8888aa;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── 섹션 카드 ── */
+  .section {
+    margin: 0 20px 24px;
+    background: linear-gradient(145deg, #0f0f24, #0d1220);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .section-header {
+    padding: 20px 22px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.02);
+  }
+  .section-emoji {
+    font-size: 20px;
+    margin-right: 8px;
+  }
+  .section-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: #f0ecff;
+    display: inline;
+    letter-spacing: -0.4px;
+  }
+  .section-body {
+    padding: 22px 22px;
+    font-size: 14.5px;
+    line-height: 1.9;
+    color: #cdcde0;
+  }
+  .section-body h3, .section-body strong {
+    color: #e8e0ff;
+    font-weight: 700;
+  }
+  .section-body p {
+    margin-bottom: 12px;
+  }
+
+  /* ── 핵심 한 줄 요약 박스 (스캔성: 섹션마다 맨 위 한눈에) ── */
+  .key-box {
+    margin: 0 0 16px;
+    padding: 13px 15px 13px 16px;
+    background: linear-gradient(135deg, rgba(167,139,250,0.16), rgba(96,165,250,0.10));
+    border-left: 3px solid #a78bfa;
+    border-radius: 0 12px 12px 0;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #f0ecff;
+    line-height: 1.6;
+  }
+  .key-box .key-label {
+    display: block;
+    font-size: 10.5px;
+    letter-spacing: 1.5px;
+    color: #a78bfa;
+    font-weight: 800;
+    margin-bottom: 5px;
+  }
+
+  /* ── 흥미 포인트 박스 ("와 이거 재밌네" 후킹) ── */
+  .fun-box {
+    position: relative;
+    margin: 20px 0;
+    padding: 18px 17px 16px;
+    background: linear-gradient(135deg, rgba(251,191,36,0.16), rgba(244,114,182,0.10));
+    border: 1px solid rgba(251,191,36,0.38);
+    border-radius: 16px;
+    font-size: 14px;
+    color: #f6ecd6;
+    line-height: 1.78;
+  }
+  .fun-box .fun-label {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: #1a1206;
+    background: linear-gradient(135deg, #fcd34d, #fbbf24);
+    font-weight: 800;
+    padding: 3px 11px;
+    border-radius: 20px;
+    margin-bottom: 9px;
+  }
+
+  /* ── 희망/대면상담 은근한 유도 박스 ── */
+  .hope-box {
+    margin: 16px 0 4px;
+    padding: 15px 17px;
+    background: linear-gradient(135deg, rgba(196,181,253,0.10), rgba(110,231,183,0.06));
+    border: 1px solid rgba(196,181,253,0.22);
+    border-radius: 14px;
+    font-size: 13.6px;
+    color: #d9d4f0;
+    line-height: 1.75;
+    font-style: normal;
+  }
+  .hope-box .hope-label {
+    display: inline-block;
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    color: #c4b5fd;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  /* ── 의미 기반 인라인 하이라이트 (3색 체계, 정밀하게) ── */
+  /* 핵심: 꼭 기억할 키워드(골드) */
+  .hl {
+    color: #ecc65f;
+    font-weight: 700;
+  }
+  /* 기회·강점·긍정 신호(민트) */
+  .hl-up {
+    color: #5fd6a6;
+    font-weight: 700;
+  }
+  /* 균형·속도조절·돌봄이 필요한 지점(살구, 공포 아님) */
+  .hl-care {
+    color: #f0a98a;
+    font-weight: 700;
+  }
+
+  /* 섹션 색상 테마 */
+  .section-intro .section-header { border-top: 3px solid #a78bfa; }
+  .section-love .section-header { border-top: 3px solid #f472b6; }
+  .section-money .section-header { border-top: 3px solid #fbbf24; }
+  .section-habit .section-header { border-top: 3px solid #34d399; }
+  .section-hapchung .section-header { border-top: 3px solid #f87171; }
+  .section-daewoon .section-header { border-top: 3px solid #60a5fa; }
+  .section-sewoon .section-header { border-top: 3px solid #a78bfa; }
+  .section-action .section-header { border-top: 3px solid #4ade80; }
+  .section-purification .section-header { border-top: 3px solid #c4b5fd; }
+
+  /* ── 대운 타임라인 ── */
+  .daewoon-list {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0 8px;
+    scrollbar-width: none;
+  }
+  .daewoon-list::-webkit-scrollbar { display: none; }
+  .daewoon-item {
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 10px 14px;
+    text-align: center;
+    min-width: 72px;
+  }
+  .daewoon-item.current {
+    background: rgba(167,139,250,0.15);
+    border-color: rgba(167,139,250,0.5);
+  }
+  .daewoon-age {
+    font-size: 10px;
+    color: #6b6b8a;
+    margin-bottom: 4px;
+  }
+  .daewoon-item.current .daewoon-age { color: #a78bfa; }
+  .daewoon-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: #e0d7ff;
+  }
+  .daewoon-item.current .daewoon-name { color: #c4b5fd; }
+  .current-badge {
+    font-size: 9px;
+    color: #a78bfa;
+    margin-top: 4px;
+    font-weight: 600;
+  }
+
+  /* ── 정화 선언문 ── */
+  .purification-box {
+    background: linear-gradient(165deg, #160a30, #0a1138);
+    border: 1px solid rgba(196,181,253,0.28);
+    border-radius: 18px;
+    padding: 30px 24px 26px;
+    margin: 16px 0 0;
+    font-family: 'Nanum Myeongjo', 'Apple SD Gothic Neo', 'Pretendard', serif;
+    font-size: 14.5px;
+    line-height: 2.15;
+    color: #e4def7;
+    text-align: center;
+    font-weight: 400;
+    letter-spacing: -0.2px;
+  }
+  .purification-box p { margin: 0 0 14px; }
+  .purification-box strong { color: #e4def7; font-weight: 700; }
+  .purification-share {
+    margin: 14px 20px 0;
+    text-align: center;
+    font-size: 11.5px;
+    color: #8b86b8;
+    letter-spacing: 0.3px;
+    word-break: keep-all;
+  }
+
+  /* ── 액션 리스트 ── */
+  .action-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+  .action-num {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    margin-top: 2px;
+  }
+  .num-do { background: rgba(74,222,128,0.2); color: #4ade80; }
+  .num-dont { background: rgba(248,113,113,0.2); color: #f87171; }
+  .num-watch { background: rgba(167,139,250,0.2); color: #a78bfa; }
+
+  /* ── 푸터 ── */
+  .footer {
+    margin: 40px 20px 0;
+    padding: 28px 20px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+    color: #4a4a6a;
+    font-size: 12px;
+    line-height: 1.9;
+  }
+  .footer-brand {
+    font-size: 14px;
+    font-weight: 700;
+    color: #6b5aad;
+    margin-bottom: 8px;
+  }
+
+  /* ── 마크다운 스타일 처리 ── */
+  .section-body h2 {
+    font-size: 16px;
+    font-weight: 800;
+    color: #e8e0ff;
+    margin: 18px 0 10px;
+    display: none; /* 섹션 헤더가 이미 있으므로 숨김 */
+  }
+  .section-body h3, .section-body h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #c4b5fd;
+    margin: 16px 0 8px;
+  }
+  .section-body ul, .section-body ol {
+    padding-left: 18px;
+    margin-bottom: 12px;
+  }
+  .section-body li {
+    margin-bottom: 6px;
+    color: #c8c8e0;
+  }
+  .section-body strong {
+    color: #e8e0ff;
+  }
+  .section-body em {
+    color: #a78bfa;
+    font-style: normal;
+  }
+
+  /* ── 신규 섹션 색상 테마 ── */
+  .section-gyeokguk .section-header { border-top: 3px solid #c084fc; }
+  .section-career .section-header   { border-top: 3px solid #5eead4; }
+  .section-family .section-header   { border-top: 3px solid #fda4af; }
+  .section-calendar .section-header { border-top: 3px solid #fdba74; }
+
+  /* ── 표지 페이지 (Gmail 모바일 호환 — table 기반) ── */
+  .cover-table {
+    width: 100%;
+    background-color: #0a0420;
+    background-image: linear-gradient(180deg, #06061a 0%, #0f0a2a 50%, #1a0533 100%);
+    border-bottom: 1px solid rgba(167,139,250,0.2);
+  }
+  .cover-inner { padding: 56px 24px 48px; text-align: center; }
+  .cover-brand {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: #a78bfa;
+    margin: 0 0 28px;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .cover-title {
+    font-family: 'Nanum Myeongjo', 'Apple SD Gothic Neo', 'Pretendard', serif;
+    font-size: 27px;
+    font-weight: 800;
+    color: #f3eeff;
+    line-height: 1.5;
+    margin: 0 0 10px;
+    text-align: center;
+    word-break: keep-all;
+    letter-spacing: -0.5px;
+  }
+  .cover-subtitle {
+    font-size: 13px;
+    color: #9ca3d0;
+    margin: 0 0 36px;
+    letter-spacing: 1px;
+    text-align: center;
+    word-break: keep-all;
+  }
+  .cover-meta {
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+    background-color: rgba(167,139,250,0.08);
+    border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 14px;
+    border-collapse: separate;
+  }
+  .cover-meta td {
+    padding: 11px 18px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(167,139,250,0.08);
+    word-break: keep-all;
+  }
+  .cover-meta tr:last-child td { border-bottom: none; }
+  .cover-meta-key {
+    color: #8b86b8;
+    text-align: left;
+    white-space: nowrap;
+    width: 35%;
+  }
+  .cover-meta-val {
+    color: #e8e3ff;
+    font-weight: 700;
+    text-align: right;
+    word-break: keep-all;
+  }
+  .cover-serial-box {
+    margin-top: 20px;
+    text-align: center;
+  }
+  .cover-serial {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #6b6790;
+    font-family: 'Courier New', monospace;
+    padding: 6px 14px;
+    border: 1px solid rgba(167,139,250,0.15);
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  /* ── 12개월 캘린더 ── */
+  .month-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 14px 0;
+  }
+  .month-cell {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(253,186,116,0.18);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .month-num {
+    font-size: 11px;
+    color: #fdba74;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .month-text {
+    font-size: 12px;
+    color: #d4d4e0;
+    line-height: 1.6;
+  }
+
+  /* ── 반응형 (모바일 가독성 강화) ── */
+  @media (max-width: 480px) {
+    body { font-size: 15px; }
+    .wrapper { padding: 0 0 32px; }
+
+    /* 표지 */
+    .cover-inner { padding: 44px 18px 36px !important; }
+    .cover-title { font-size: 22px !important; line-height: 1.4 !important; }
+    .cover-subtitle { font-size: 12px !important; margin-bottom: 28px !important; }
+    .cover-meta td { padding: 9px 14px !important; font-size: 12px !important; }
+
+    /* 헤더 */
+    .header { padding: 36px 20px 28px; }
+    .header-title { font-size: 22px; line-height: 1.4; word-break: keep-all; }
+    .header-sub { font-size: 12px; line-height: 1.7; }
+
+    /* 사주 카드 */
+    .saju-card { margin: 20px 12px; padding: 20px 14px; }
+    .saju-card-title { font-size: 12px; }
+    .ilgan-badge { font-size: 12px; padding: 10px 12px; word-break: keep-all; }
+
+    /* 오행 */
+    .ohaeng-section { margin: 0 12px 22px; padding: 20px 16px; }
+
+    /* 섹션 */
+    .section { margin: 0 12px 20px; }
+    .section-header { padding: 16px 18px 14px; }
+    .section-title { font-size: 16px; word-break: keep-all; }
+    .section-body { padding: 19px; font-size: 14.3px; line-height: 1.88; }
+
+    /* 대운/세운 */
+    .daewoon-item { min-width: 64px; padding: 9px 11px; }
+    .daewoon-name { font-size: 14px; }
+
+    /* 12개월 */
+    .month-grid { grid-template-columns: 1fr; }
+
+    /* 푸터 */
+    .footer { margin: 28px 16px 0; padding: 22px 16px; }
+  }
+
+  @media (max-width: 360px) {
+    .cover-title { font-size: 20px !important; }
+    .header-title { font-size: 20px; }
+    .section-title { font-size: 14px; }
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background:#0b0b14;">
+{% set OH_COLOR = {'목':'#4ade80','화':'#f87171','토':'#fbbf24','금':'#e5e7eb','수':'#60a5fa'} %}
+{% set OH_BAR = {'목':'#4caf50','화':'#ff7043','토':'#fbbf24','금':'#c4c4cc','수':'#42a5f5'} %}
+{%- macro section(title, accent='#a78bfa') %}
+<div style="margin:0 14px 20px;background:#101019;border:1px solid #222231;border-top:3px solid {{ accent }};border-radius:16px;overflow:hidden;">
+  <div style="padding:18px 20px 13px;border-bottom:1px solid #1e1e2b;background:#13131f;">
+    <span style="font-size:17px;font-weight:800;color:#f0ecff;letter-spacing:-0.4px;word-break:keep-all;">{{ title }}</span>
+  </div>
+  <div style="padding:20px;font-size:14.5px;line-height:1.9;color:#cfcfe0;word-break:keep-all;">
+    {{ caller() }}
+  </div>
+</div>
+{%- endmacro %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0b0b14;margin:0;">
+<tr><td align="center" style="padding:0;">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:#0b0b14;">
+<tr><td style="padding:0 0 36px;">
+
+  <!-- ── 표지 페이지 (table-based, Gmail 모바일 호환) ── -->
+  <table class="cover-table" role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+         style="background-color:#0a0420;">
+    <tr>
+      <td class="cover-inner" align="center" style="padding:56px 24px 48px;text-align:center;">
+
+        <div class="cover-brand" style="font-size:11px;letter-spacing:4px;color:#a78bfa;font-weight:700;margin:0 0 28px;">
+          LIFECODE HACKER
+        </div>
+
+        <h1 class="cover-title"
+            style="font-size:26px;font-weight:900;color:#f3eeff;line-height:1.45;margin:0 0 10px;word-break:keep-all;">
+          {{ name }}님의<br>인생 무의식 패턴 보고서
+        </h1>
+
+        {% if cover_line %}
+        <div class="cover-essence serif"
+             style="font-size:18px;font-weight:700;color:#e7c66b;line-height:1.55;margin:18px auto 8px;max-width:300px;word-break:keep-all;">
+          {{ cover_line }}
+        </div>
+        {% endif %}
+
+        <p class="cover-subtitle"
+           style="font-size:13px;color:#9ca3d0;letter-spacing:1px;margin:0 0 32px;word-break:keep-all;">
+          사주명리와 무의식 정화 통합 분석
+        </p>
+
+        {% if has_persona_image %}
+        <!-- ── 사주 상징 이미지 (그 사람의 기운을 담은 한 장) ── -->
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 32px;">
+          <tr><td align="center" style="text-align:center;">
+            <img src="cid:persona" width="262" alt="당신의 사주 상징 이미지"
+                 style="width:262px;max-width:74%;height:auto;border-radius:18px;
+                        border:1px solid rgba(231,198,107,0.45);display:block;margin:0 auto;">
+            <div class="serif" style="font-size:12px;color:#a99fce;margin-top:13px;letter-spacing:0.5px;word-break:keep-all;">
+              {{ ilgan.name }}({{ ilgan.ohaeng }})의 기운을 담은 당신의 상징
+            </div>
+          </td></tr>
+        </table>
+        {% endif %}
+
+        <table class="cover-meta" role="presentation" cellpadding="0" cellspacing="0" border="0"
+               style="width:100%;max-width:440px;margin:0 auto;background-color:rgba(167,139,250,0.08);
+                      border:1px solid rgba(167,139,250,0.2);border-radius:14px;">
+          <tr>
+            <td class="cover-meta-key" style="padding:11px 18px;font-size:13px;color:#8b86b8;text-align:left;white-space:nowrap;width:35%;border-bottom:1px solid rgba(167,139,250,0.08);">의뢰인</td>
+            <td class="cover-meta-val" style="padding:11px 18px;font-size:13px;color:#e8e3ff;font-weight:700;text-align:right;word-break:keep-all;border-bottom:1px solid rgba(167,139,250,0.08);">{{ name }}</td>
+          </tr>
+          <tr>
+            <td class="cover-meta-key" style="padding:11px 18px;font-size:13px;color:#8b86b8;text-align:left;white-space:nowrap;border-bottom:1px solid rgba(167,139,250,0.08);">생년월일</td>
+            <td class="cover-meta-val" style="padding:11px 18px;font-size:13px;color:#e8e3ff;font-weight:700;text-align:right;word-break:keep-all;border-bottom:1px solid rgba(167,139,250,0.08);">{{ birth_date }}</td>
+          </tr>
+          <tr>
+            <td class="cover-meta-key" style="padding:11px 18px;font-size:13px;color:#8b86b8;text-align:left;white-space:nowrap;border-bottom:1px solid rgba(167,139,250,0.08);">출생시간</td>
+            <td class="cover-meta-val" style="padding:11px 18px;font-size:13px;color:#e8e3ff;font-weight:700;text-align:right;word-break:keep-all;border-bottom:1px solid rgba(167,139,250,0.08);">{{ birth_time }}</td>
+          </tr>
+          <tr>
+            <td class="cover-meta-key" style="padding:11px 18px;font-size:13px;color:#8b86b8;text-align:left;white-space:nowrap;border-bottom:1px solid rgba(167,139,250,0.08);">성별</td>
+            <td class="cover-meta-val" style="padding:11px 18px;font-size:13px;color:#e8e3ff;font-weight:700;text-align:right;word-break:keep-all;border-bottom:1px solid rgba(167,139,250,0.08);">{{ gender }}</td>
+          </tr>
+          <tr>
+            <td class="cover-meta-key" style="padding:11px 18px;font-size:13px;color:#8b86b8;text-align:left;white-space:nowrap;">발행일</td>
+            <td class="cover-meta-val" style="padding:11px 18px;font-size:13px;color:#e8e3ff;font-weight:700;text-align:right;word-break:keep-all;">{{ report_date }}</td>
+          </tr>
+        </table>
+
+        <div class="cover-serial-box" style="margin-top:20px;text-align:center;">
+          <span class="cover-serial"
+                style="display:inline-block;font-size:10px;letter-spacing:2px;color:#6b6790;
+                       font-family:'Courier New',monospace;padding:6px 14px;
+                       border:1px solid rgba(167,139,250,0.15);border-radius:6px;white-space:nowrap;">
+            REPORT NO. {{ serial_no }}
+          </span>
+        </div>
+
+      </td>
+    </tr>
+  </table>
+
+  <!-- ── 서문 (선물 같은 헌사) ── -->
+  <div style="text-align:center;padding:38px 30px 34px;">
+    <div style="width:44px;height:1px;background:#e7c66b;margin:0 auto 20px;font-size:0;line-height:0;">&nbsp;</div>
+    <div style="font-family:'Nanum Myeongjo','Apple SD Gothic Neo',serif;font-size:14.5px;line-height:2.0;color:#cfc8ea;word-break:keep-all;">
+      이 보고서는 {{ name }}님 단 한 분을 위해<br>
+      사주명리와 무의식 정화의 언어로 정성껏 쓰였습니다.<br>
+      서두르지 말고, 마음이 머무는 문장에 잠시 머물러 주세요.<br>
+      여기 적힌 모든 것은 당신을 탓하기 위함이 아니라,<br>
+      더 자유로워지기 위한 지도입니다.
+    </div>
+    <div style="width:44px;height:1px;background:#e7c66b;margin:20px auto 0;font-size:0;line-height:0;">&nbsp;</div>
+  </div>
+
+  <!-- ── 사주팔자 원국 (시주→일주→월주→년주) ── -->
+  <div style="margin:24px 14px;background:#11111f;border:1px solid #222231;border-radius:18px;padding:22px 16px;">
+    <div style="font-size:12px;font-weight:800;letter-spacing:0.5px;color:#a78bfa;margin-bottom:14px;">내 사주 원국</div>
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:separate;border-spacing:6px 0;">
+      <tr>
+        {% for key in ['si', 'il', 'wol', 'nyeon'] %}
+        {% set p = pillars[key] %}
+        <td width="25%" align="center" valign="top"
+            style="background-color:#1a1a28;border:1px solid #2c2c40;border-radius:14px;padding:14px 4px;">
+          <div style="font-size:10px;color:#6b6b8a;font-weight:600;letter-spacing:1px;margin-bottom:8px;">{{ p.label }}</div>
+          <div style="font-size:24px;font-weight:900;line-height:1.2;">
+            <div style="color:{{ OH_COLOR[p.ohaeng_stem] }};">{{ p.stem_hanja }}</div>
+            <div style="color:{{ OH_COLOR[p.ohaeng_branch] }};margin-top:2px;">{{ p.branch_hanja }}</div>
+          </div>
+          <div style="font-size:11px;color:#8878cc;margin-top:8px;word-break:keep-all;">{{ p.name_kor }}</div>
+        </td>
+        {% endfor %}
+      </tr>
+    </table>
+
+    <div style="margin-top:16px;padding:10px 14px;background:#1c1733;border:1px solid #322a5a;border-radius:10px;font-size:13px;color:#c4b5fd;text-align:center;word-break:keep-all;">
+      일간(日干, 나의 에너지) <strong style="color:#e8e0ff;">{{ ilgan.name }}({{ ilgan.ohaeng }})</strong> {{ ilgan.strength_label }}
+    </div>
+
+    {% set d = ilgan.strength_detail %}
+    <div style="margin-top:14px;padding:14px 16px 12px;background:#211c0f;border:1px solid #5a4d22;border-radius:12px;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:0.4px;color:#e7c66b;margin-bottom:10px;">분석 근거 · 정통 만세력 계산</div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="font-size:12px;color:#9a93b8;padding:4px 10px 4px 0;white-space:nowrap;vertical-align:top;width:88px;">강약 판정</td>
+          <td style="font-size:12.5px;color:#dcdce8;font-weight:600;padding:4px 0;line-height:1.5;">{{ ilgan.strength_label }} <span style="color:#7d789c;font-weight:400;font-size:11px;">종합 {{ d.total }}점</span></td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:#9a93b8;padding:4px 10px 4px 0;white-space:nowrap;vertical-align:top;">월령(月令)</td>
+          <td style="font-size:12.5px;color:#dcdce8;font-weight:600;padding:4px 0;line-height:1.5;">{{ '득령' if d.weolryeong else '실령' }} <span style="color:#7d789c;font-weight:400;font-size:11px;">태어난 달이 나를 {{ '받쳐줍니다' if d.weolryeong else '받쳐주지 않습니다' }}</span></td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:#9a93b8;padding:4px 10px 4px 0;white-space:nowrap;vertical-align:top;">득지(得地)</td>
+          <td style="font-size:12.5px;color:#dcdce8;font-weight:600;padding:4px 0;line-height:1.5;">{{ '성공' if d.deukji else '약함' }} <span style="color:#7d789c;font-weight:400;font-size:11px;">일지(배우자 자리)의 지원</span></td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:#9a93b8;padding:4px 10px 4px 0;white-space:nowrap;vertical-align:top;">득세(得勢)</td>
+          <td style="font-size:12.5px;color:#dcdce8;font-weight:600;padding:4px 0;line-height:1.5;">{{ d.score_deukse }}점 <span style="color:#7d789c;font-weight:400;font-size:11px;">주변 글자들의 지원</span></td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:#9a93b8;padding:4px 10px 4px 0;white-space:nowrap;vertical-align:top;">나를 돕는 기운</td>
+          <td style="font-size:12.5px;color:#ecc65f;font-weight:700;padding:4px 0;">{{ d.helping_ohaeng | join(' · ') }}</td>
+        </tr>
+      </table>
+      <div style="margin-top:9px;font-size:10.5px;color:#6f6a8e;text-align:center;">이 보고서의 모든 해석은 위 계산을 근거로 합니다.</div>
+    </div>
+  </div>
+
+  <!-- ── 오행 분포 ── -->
+  <div style="margin:0 14px 24px;background:#11111f;border:1px solid #222231;border-radius:18px;padding:20px 16px;">
+    <div style="font-size:12px;font-weight:800;letter-spacing:0.5px;color:#a78bfa;margin-bottom:4px;">오행 에너지 지도</div>
+    <div style="font-size:11px;color:#7d789c;margin-bottom:14px;word-break:keep-all;">천간·지지에 더해 지지 속에 숨은 기운(지장간)까지 반영한 분포입니다</div>
+    {% for oh in ['목', '화', '토', '금', '수'] %}
+    {% set info = ohaeng[oh] %}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:9px;"><tr>
+      <td width="26" style="font-size:13px;font-weight:800;color:{{ OH_COLOR[oh] }};">{{ oh }}</td>
+      <td style="padding:0 8px;">
+        <div style="background:#22222e;border-radius:6px;height:10px;width:100%;">
+          <div style="background:{{ OH_BAR[oh] }};height:10px;border-radius:6px;width:{{ info.pct }}%;font-size:0;line-height:0;">&nbsp;</div>
+        </div>
+      </td>
+      <td width="42" style="font-size:12px;color:#9a9ab5;text-align:right;">{{ info.pct }}%</td>
+    </tr></table>
+    {% endfor %}
+  </div>
+
+  <!-- ── 섹션 1: 핵심 코드 ── -->
+  {% call section('인생 핵심 코드', '#a78bfa') %}{{ sections.intro | safe }}{% endcall %}
+
+  <!-- ── 섹션 1.5 (신규): 격국·용신 ── -->
+  {% call section('내 사주의 본질 구조와 보충해야 할 에너지', '#c084fc') %}{{ sections.gyeokguk | safe }}{% endcall %}
+
+  <!-- ── 섹션 2: 연애 패턴 ── -->
+  {% call section('연애와 관계 무의식 패턴', '#f472b6') %}{{ sections.love | safe }}{% endcall %}
+
+  <!-- ── 섹션 3: 재물 패턴 ── -->
+  {% call section('돈이 막히는 진짜 이유', '#fbbf24') %}{{ sections.money | safe }}{% endcall %}
+
+  <!-- ── 섹션 4: 습관 패턴 ── -->
+  {% call section('알면서도 못 바꾸는 것들', '#34d399') %}{{ sections.habit | safe }}{% endcall %}
+
+  <!-- ── 섹션 4.5 (신규): 직업·적성 + 건강·체질 ── -->
+  {% call section('직업·적성과 건강·체질 코드', '#5eead4') %}{{ sections.career | safe }}{% endcall %}
+
+  <!-- ── 섹션 5: 합충파해 ── -->
+  {% call section('내 사주에서 충돌하는 에너지', '#f87171') %}
+    {% if hapchung.chungs %}<p style="font-size:13px;color:#f87171;margin:0 0 12px;">충(沖)·극(克) {{ hapchung.chungs | join(' / ') }}</p>{% endif %}
+    {% if hapchung.haps %}<p style="font-size:13px;color:#4ade80;margin:0 0 12px;">합(合) {{ hapchung.haps | join(' / ') }}</p>{% endif %}
+    {% if hapchung.pas %}<p style="font-size:13px;color:#fbbf24;margin:0 0 12px;">파(破) {{ hapchung.pas | join(' / ') }}</p>{% endif %}
+    {% if hapchung.haes %}<p style="font-size:13px;color:#c084fc;margin:0 0 12px;">해(害) {{ hapchung.haes | join(' / ') }}</p>{% endif %}
+    {{ sections.hapchung | safe }}
+  {% endcall %}
+
+  <!-- ── 섹션 5.5 (신규): 가족·인간관계 자리 해석 ── -->
+  {% call section('가족과 인간관계 자리 해석', '#fda4af') %}{{ sections.family | safe }}{% endcall %}
+
+  <!-- ── 섹션 6: 대운 ── -->
+  {% call section('지금 나는 어느 흐름에 있는가', '#60a5fa') %}
+    <div style="text-align:center;margin-bottom:14px;">
+      {% for dw in daewoon_list %}<span style="display:inline-block;margin:3px;padding:6px 9px;border-radius:8px;background:{{ '#2a2350' if dw.is_current else '#1a1a26' }};border:1px solid {{ '#a78bfa' if dw.is_current else '#2a2a3a' }};font-size:11.5px;color:#cfcfe0;white-space:nowrap;"><span style="color:#8888aa;">{{ dw.start_age }}~{{ dw.end_age }}</span> <strong style="color:#e8e0ff;">{{ dw.name_hanja }}</strong>{% if dw.is_current %} <span style="color:#a78bfa;">(현재)</span>{% endif %}</span>{% endfor %}
+    </div>
+    {{ sections.daewoon | safe }}
+  {% endcall %}
+
+  <!-- ── 섹션 7: 세운 ── -->
+  {% call section(sewoon.first.year ~ '-' ~ sewoon.second.year ~ ' 무의식 발동 시점', '#a78bfa') %}
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:16px;"><tr>
+      <td width="50%" style="padding-right:6px;vertical-align:top;">
+        <div style="background:#1a1733;border:1px solid #322a5a;border-radius:12px;padding:14px;text-align:center;">
+          <div style="font-size:11px;color:#8888aa;margin-bottom:4px;">{{ sewoon.first.year }}년</div>
+          <div style="font-size:22px;font-weight:900;color:#c4b5fd;">{{ sewoon.first.name_hanja }}</div>
+          <div style="font-size:11px;color:#7878aa;margin-top:2px;">{{ sewoon.first.name }}년</div>
+        </div>
+      </td>
+      <td width="50%" style="padding-left:6px;vertical-align:top;">
+        <div style="background:#101d33;border:1px solid #24395a;border-radius:12px;padding:14px;text-align:center;">
+          <div style="font-size:11px;color:#8888aa;margin-bottom:4px;">{{ sewoon.second.year }}년</div>
+          <div style="font-size:22px;font-weight:900;color:#93c5fd;">{{ sewoon.second.name_hanja }}</div>
+          <div style="font-size:11px;color:#7878aa;margin-top:2px;">{{ sewoon.second.name }}년</div>
+        </div>
+      </td>
+    </tr></table>
+    {{ sections.sewoon | safe }}
+  {% endcall %}
+
+  <!-- ── 섹션 7.5 (신규): 12개월 운세 캘린더 ── -->
+  {% call section(sewoon.first.year ~ '년 월별 무의식 흐름 캘린더', '#fdba74') %}{{ sections.calendar | safe }}{% endcall %}
+
+  <!-- ── 섹션 8: 실행 과제 ── -->
+  {% call section('이번 달 실행 과제', '#4ade80') %}{{ sections.action | safe }}{% endcall %}
+
+  <!-- ── 섹션 9: 정화 선언문 ── -->
+  {% call section('나만의 정화 선언문', '#c4b5fd') %}
+    <div style="background:#160a30;border:1px solid #3a3566;border-radius:16px;padding:26px 22px;font-family:'Nanum Myeongjo','Apple SD Gothic Neo',serif;font-size:14.5px;line-height:2.1;color:#e4def7;text-align:center;">
+      {{ sections.purification | safe }}
+    </div>
+    <div style="margin-top:14px;text-align:center;font-size:11.5px;color:#8b86b8;word-break:keep-all;">마음에 닿는 문장을 캡처해 간직하세요. 매일 아침 한 번, 흔들릴 때 한 번 읽으면 더 단단해집니다.</div>
+  {% endcall %}
+
+  <!-- ── 닫는 초대 ── -->
+  <div style="margin:0 14px 20px;background:#13101f;border:1px solid #3a3566;border-radius:16px;padding:26px 22px;text-align:center;">
+    <div style="font-family:'Nanum Myeongjo','Apple SD Gothic Neo',serif;font-size:17px;color:#f0ecff;font-weight:800;margin-bottom:10px;line-height:1.5;">패턴을 아는 것은 시작입니다</div>
+    <p style="font-size:13.5px;color:#bdbdda;line-height:1.85;margin:0 0 8px;word-break:keep-all;">이 보고서에 담긴 무의식의 결을 글로 마주한 것만으로도, {{ name }}님은 이미 절반의 변화를 시작하셨어요. 같은 패턴을 반복하던 자리에서 한 걸음 물러나 바라볼 수 있게 되었으니까요.</p>
+    <p style="font-size:13.5px;color:#bdbdda;line-height:1.85;margin:0;word-break:keep-all;">그리고 그 패턴을 더 깊이 풀어내고 실제 삶의 흐름까지 바꿔내는 일은, <span style="color:#c4b5fd;font-weight:700;">무의식 정화</span>를 통해 한 분 한 분 함께 해오고 있어요. 준비가 되었을 때, 더 깊은 이야기로 만나요.</p>
+  </div>
+
+  <!-- ── 푸터 ── -->
+  <div style="margin:28px 16px 0;padding:22px 16px;text-align:center;border-top:1px solid #1e1e2b;">
+    <div style="font-size:13px;font-weight:800;color:#a78bfa;margin-bottom:10px;">라이프코드 해커</div>
+    <p style="font-size:11.5px;color:#6b6b86;line-height:1.7;margin:0 0 4px;">이 보고서는 {{ name }}님을 위해 생성된 개인 맞춤 분석입니다.</p>
+    <p style="font-size:11.5px;color:#6b6b86;line-height:1.7;margin:0;">보고서는 참고용이며, 최종 선택과 결정은 항상 당신이 합니다.</p>
+    <p style="margin-top:10px;font-size:11px;color:#3a3a4a;">라이프코드 해커 | 사주명리와 무의식 정화</p>
+  </div>
+
+</td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>

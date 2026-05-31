@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>라이프코드 해커 — 사주 운세 + 무의식 분석을 한 번에</title>
+<meta name="description" content="사주 운세도 보고, 반복되는 무의식 패턴까지 한 번에. 올해 흐름은 기본, 연애·돈·습관이 왜 반복되는지 그 뿌리까지 분석합니다. 8,900원, 5~10분 내 이메일 발송.">
+<meta property="og:title" content="라이프코드 해커 — 사주 운세 + 무의식, 한 번에">
+<meta property="og:description" content="올해 운세도 보고, 왜 같은 연애·돈 문제를 반복하는지 무의식의 뿌리까지. 사주 하나로 운세와 패턴을 동시에.">
+<meta property="og:image" content="/static/og-image.png">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #07070f;
+  --surface:  #0e0e1e;
+  --surface2: #13132a;
+  --border:   rgba(167,139,250,0.18);
+  --purple:   #a78bfa;
+  --blue:     #60a5fa;
+  --pink:     #f472b6;
+  --green:    #4ade80;
+  --yellow:   #fbbf24;
+  --text:     #e8e8f4;
+  --muted:    #8888aa;
+  --card-r:   20px;
+  --max-w:    540px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;
+  font-size:16px;
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.wrap{max-width:var(--max-w);margin:0 auto;padding:0 20px;}
+
+/* ── 네비 ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(7,7,15,0.85);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  padding:14px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.nav-brand{font-size:15px;font-weight:900;letter-spacing:-0.3px;color:var(--purple);}
+.nav-cta{
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  color:#fff;font-size:13px;font-weight:700;
+  padding:8px 16px;border-radius:99px;text-decoration:none;
+  white-space:nowrap;
+}
+
+/* ── 히어로 ── */
+.hero{
+  padding:120px 20px 80px;
+  text-align:center;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%,rgba(124,58,237,0.22),transparent),
+    radial-gradient(ellipse 60% 40% at 80% 80%,rgba(37,99,235,0.1),transparent);
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a78bfa' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events:none;
+}
+.hero-badge{
+  display:inline-block;
+  background:rgba(167,139,250,0.12);
+  border:1px solid rgba(167,139,250,0.3);
+  color:var(--purple);
+  font-size:12px;font-weight:700;letter-spacing:1.5px;
+  padding:6px 16px;border-radius:99px;
+  text-transform:uppercase;margin-bottom:24px;
+}
+.hero-title{
+  font-size:clamp(28px,8vw,40px);
+  font-weight:900;
+  line-height:1.25;
+  letter-spacing:-1px;
+  color:#fff;
+  margin-bottom:20px;
+}
+.hero-title .grad{
+  background:linear-gradient(90deg,var(--purple),var(--blue),var(--pink));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-desc{
+  font-size:16px;color:var(--muted);
+  max-width:360px;margin:0 auto 36px;line-height:1.8;
+}
+.hero-cta{
+  display:inline-block;
+  background:linear-gradient(135deg,#7c3aed,#2563eb);
+  color:#fff;font-size:17px;font-weight:800;
+  padding:18px 36px;border-radius:16px;
+  text-decoration:none;
+  box-shadow:0 8px 32px rgba(124,58,237,0.4);
+  transition:transform 0.2s,box-shadow 0.2s;
+  letter-spacing:-0.3px;
+}
+.hero-cta:active{transform:scale(0.97);}
+.hero-price{
+  margin-top:14px;
+  font-size:13px;color:var(--muted);
+}
+.hero-price strong{color:var(--text);}
+
+/* ── 소셜 프루프 숫자 ── */
+.stats{
+  display:flex;gap:0;
+  margin:48px 20px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--card-r);
+  overflow:hidden;
+}
+.stat{
+  flex:1;padding:20px 12px;text-align:center;
+  border-right:1px solid var(--border);
+}
+.stat:last-child{border-right:none;}
+.stat-num{
+  font-size:22px;font-weight:900;
+  background:linear-gradient(90deg,var(--purple),var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.stat-label{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* ── 공감 섹션 ── */
+.pain{
+  padding:60px 20px;
+  text-align:center;
+}
+.section-tag{
+  display:inline-block;font-size:11px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;
+  color:var(--purple);margin-bottom:12px;
+}
+.section-title{
+  font-size:clamp(22px,6vw,28px);
+  font-weight:900;line-height:1.3;
+  letter-spacing:-0.5px;
+  color:#fff;margin-bottom:8px;
+}
+.section-sub{font-size:14px;color:var(--muted);margin-bottom:32px;}
+.pain-cards{display:flex;flex-direction:column;gap:12px;}
+.pain-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--card-r);
+  padding:20px;
+  text-align:left;
+  display:flex;align-items:flex-start;gap:14px;
+}
+.pain-icon{font-size:24px;flex-shrink:0;margin-top:2px;}
+.pain-text{font-size:15px;color:var(--text);line-height:1.65;}
+.pain-text strong{color:#fff;display:block;margin-bottom:2px;}
+
+/* ── WHY 섹션 ── */
+.why{
+  padding:60px 20px;
+  background:linear-gradient(180deg,transparent,rgba(124,58,237,0.06),transparent);
+}
+.why-box{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--card-r);
+  padding:28px 24px;
+}
+.why-quote{
+  font-size:18px;font-weight:700;
+  color:#fff;line-height:1.6;
+  margin-bottom:20px;
+  border-left:3px solid var(--purple);
+  padding-left:16px;
+}
+.why-desc{font-size:14px;color:var(--muted);line-height:1.9;}
+
+/* ── 차별화 포인트 ── */
+.diff{padding:60px 20px;}
+.diff-list{display:flex;flex-direction:column;gap:14px;}
+.diff-item{
+  display:flex;gap:16px;align-items:flex-start;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--card-r);
+  padding:20px;
+}
+.diff-icon{
+  width:42px;height:42px;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(124,58,237,0.2),rgba(37,99,235,0.2));
+  border:1px solid var(--border);
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+}
+.diff-content strong{display:block;font-size:15px;color:#fff;margin-bottom:4px;}
+.diff-content span{font-size:13px;color:var(--muted);line-height:1.7;}
+
+/* ── 보고서 미리보기 ── */
+.preview{padding:60px 20px;}
+.preview-list{display:flex;flex-direction:column;gap:10px;}
+.preview-item{
+  display:flex;align-items:center;gap:14px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px 18px;
+}
+.preview-check{
+  width:24px;height:24px;flex-shrink:0;
+  background:rgba(74,222,128,0.15);
+  border:1px solid rgba(74,222,128,0.3);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:var(--green);font-weight:900;
+}
+.preview-text{font-size:14px;color:var(--text);}
+.preview-text em{font-style:normal;color:var(--muted);font-size:12px;}
+
+/* ── 신청 폼 섹션 ── */
+#form-section{
+  padding:60px 20px 80px;
+  background:linear-gradient(180deg,transparent,rgba(124,58,237,0.08));
+}
+.form-box{
+  background:var(--surface2);
+  border:1px solid rgba(167,139,250,0.25);
+  border-radius:24px;
+  padding:32px 24px;
+}
+.form-title{
+  font-size:20px;font-weight:900;color:#fff;
+  margin-bottom:6px;text-align:center;
+}
+.form-sub{
+  font-size:13px;color:var(--muted);
+  text-align:center;margin-bottom:28px;
+}
+.price-tag{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:rgba(167,139,250,0.1);
+  border:1px solid rgba(167,139,250,0.25);
+  border-radius:12px;
+  padding:12px;margin-bottom:24px;
+}
+.price-tag .price{
+  font-size:24px;font-weight:900;
+  background:linear-gradient(90deg,var(--purple),var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.price-tag .price-desc{font-size:13px;color:var(--muted);}
+
+.form-group{margin-bottom:16px;}
+label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px;letter-spacing:0.3px;}
+input,select{
+  width:100%;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;
+  color:var(--text);
+  font-size:15px;
+  font-family:inherit;
+  padding:14px 16px;
+  outline:none;
+  transition:border 0.2s;
+  -webkit-appearance:none;
+  appearance:none;
+}
+input:focus,select:focus{border-color:var(--purple);}
+input::placeholder{color:rgba(255,255,255,0.25);}
+select option{background:#1a1a2e;color:var(--text);}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.lunar-row{display:flex;align-items:center;gap:10px;margin-top:6px;}
+.lunar-toggle{
+  display:flex;gap:0;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;overflow:hidden;
+  width:100%;
+}
+.lunar-btn{
+  flex:1;padding:12px;text-align:center;
+  font-size:14px;font-weight:700;color:var(--muted);
+  cursor:pointer;transition:all 0.2s;
+  background:none;border:none;font-family:inherit;
+}
+.lunar-btn.active{
+  background:rgba(167,139,250,0.2);
+  color:var(--purple);
+}
+
+.submit-btn{
+  width:100%;
+  background:linear-gradient(135deg,#7c3aed,#2563eb);
+  color:#fff;font-size:17px;font-weight:800;
+  border:none;border-radius:16px;
+  padding:18px;cursor:pointer;
+  margin-top:20px;
+  letter-spacing:-0.3px;
+  transition:opacity 0.2s,transform 0.1s;
+  font-family:inherit;
+}
+.submit-btn:hover{opacity:0.92;}
+.submit-btn:active{transform:scale(0.98);}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.form-notice{
+  text-align:center;font-size:12px;color:var(--muted);
+  margin-top:14px;line-height:1.7;
+}
+/* ── 청약철회 제한 고지 + 동의 ── */
+.consent-box{
+  margin-top:22px;
+  background:rgba(167,139,250,0.06);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px 18px;
+}
+.consent-title{
+  font-size:13px;font-weight:800;color:var(--text);
+  margin-bottom:10px;letter-spacing:-0.2px;
+}
+.consent-list{
+  list-style:none;margin:0 0 12px;padding:0;
+}
+.consent-list li{
+  position:relative;padding-left:14px;
+  font-size:12.5px;color:var(--muted);line-height:1.75;
+  word-break:keep-all;
+}
+.consent-list li::before{
+  content:"·";position:absolute;left:2px;color:var(--purple);font-weight:800;
+}
+.consent-list li strong{color:var(--text);font-weight:700;}
+.consent-check{
+  display:flex;align-items:flex-start;gap:9px;
+  cursor:pointer;padding-top:10px;
+  border-top:1px solid var(--border);
+}
+.consent-check input{
+  width:18px;height:18px;margin-top:1px;flex-shrink:0;
+  accent-color:var(--purple);cursor:pointer;
+}
+.consent-check span{
+  font-size:12.5px;color:var(--muted);line-height:1.6;
+  font-weight:500;word-break:keep-all;
+}
+.consent-check span strong{color:var(--purple);font-weight:700;}
+
+/* ── FAQ ── */
+.faq{padding:60px 20px;}
+.faq-item{
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  padding:20px 0;
+}
+.faq-item:last-child{border-bottom:none;}
+.faq-q{
+  font-size:15px;font-weight:700;color:#fff;
+  margin-bottom:8px;display:flex;gap:8px;
+}
+.faq-q::before{content:'Q.';color:var(--purple);}
+.faq-a{font-size:14px;color:var(--muted);line-height:1.8;}
+
+/* ── 푸터 ── */
+footer{
+  text-align:center;padding:32px 20px;
+  border-top:1px solid rgba(255,255,255,0.06);
+  font-size:12px;color:#44445a;line-height:1.9;
+}
+footer strong{color:#6b6b8a;}
+
+/* ── 로딩 오버레이 ── */
+#loading{
+  display:none;position:fixed;inset:0;z-index:999;
+  background:rgba(7,7,15,0.92);
+  backdrop-filter:blur(8px);
+  flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:40px;
+}
+#loading.show{display:flex;}
+.loading-spinner{
+  width:48px;height:48px;
+  border:3px solid rgba(167,139,250,0.2);
+  border-top-color:var(--purple);
+  border-radius:50%;
+  animation:spin 0.8s linear infinite;
+  margin-bottom:24px;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-title{font-size:18px;font-weight:800;color:#fff;margin-bottom:8px;}
+.loading-sub{font-size:14px;color:var(--muted);}
+.loading-steps{margin-top:24px;text-align:left;display:flex;flex-direction:column;gap:8px;}
+.loading-step{font-size:13px;color:var(--muted);}
+.loading-step.done{color:var(--green);}
+.loading-step.active{color:#fff;}
+
+/* ── 성공 팝업 ── */
+#success{
+  display:none;position:fixed;inset:0;z-index:999;
+  background:rgba(7,7,15,0.95);
+  flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:40px;
+}
+#success.show{display:flex;}
+.success-icon{font-size:64px;margin-bottom:24px;}
+.success-title{font-size:24px;font-weight:900;color:#fff;margin-bottom:8px;}
+.success-sub{font-size:15px;color:var(--muted);line-height:1.8;}
+.success-email{
+  margin:20px 0;
+  background:rgba(74,222,128,0.1);
+  border:1px solid rgba(74,222,128,0.25);
+  border-radius:12px;padding:14px 20px;
+  font-size:15px;color:var(--green);font-weight:700;
+}
+</style>
+</head>
+<body>
+
+<!-- ── 네비 ── -->
+<nav>
+  <span class="nav-brand">⟨ 라이프코드 해커 ⟩</span>
+  <span style="display:flex;align-items:center;gap:14px;">
+    <a href="/reviews" style="font-size:13px;color:var(--muted);text-decoration:none;font-weight:600;">후기</a>
+    <a href="#form-section" class="nav-cta">지금 신청 →</a>
+  </span>
+</nav>
+
+<!-- ── 히어로 ── -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-badge">사주 운세 + 무의식 분석 · 한 번에</div>
+    <h1 class="hero-title">
+      내 <span class="grad">사주 운세</span>도 보고<br>
+      반복되는 <span class="grad">무의식</span>까지<br>
+      한 번에 꿰뚫다
+    </h1>
+    <p class="hero-desc">
+      그냥 운세만 보고 끝? 아닙니다.<br>
+      <strong>올해 흐름(운세)</strong>은 기본,<br>
+      연애·돈·습관이 <strong>왜 반복되는지</strong> 그 무의식의 뿌리까지.<br>
+      <strong>사주 한 번으로, 운세와 패턴을 동시에.</strong>
+    </p>
+    <a href="#form-section" class="hero-cta">내 운세 + 무의식 보러가기 →</a>
+    <div class="hero-price">
+      <strong>₩8,900</strong> · 결제 후 5~10분 내 이메일 발송
+    </div>
+  </div>
+</section>
+
+<!-- ── 스탯 ── -->
+<div class="stats wrap" style="margin:0 auto;max-width:540px;">
+  <div class="stat">
+    <div class="stat-num">13개</div>
+    <div class="stat-label">무의식 패턴 해부</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">5분</div>
+    <div class="stat-label">메일로 바로 도착</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">1:1</div>
+    <div class="stat-label">세상에 단 하나</div>
+  </div>
+</div>
+
+<!-- ── 공감 섹션 ── -->
+<section class="pain">
+  <div class="wrap">
+    <div class="section-tag">혹시 이런 생각 해봤나요?</div>
+    <h2 class="section-title">왜 나는 늘<br>같은 패턴일까?</h2>
+    <p class="section-sub">당신만의 문제가 아닙니다. 사주에 이미 패턴이 새겨져 있어요.</p>
+    <div class="pain-cards">
+      <div class="pain-card">
+        <span class="pain-icon">💔</span>
+        <div class="pain-text">
+          <strong>"나는 왜 늘 이런 사람에게 끌릴까?"</strong>
+          좋은 사람이 있어도 끌리지 않고, 안 되는 사람에게만 끌리는 이유
+        </div>
+      </div>
+      <div class="pain-card">
+        <span class="pain-icon">💸</span>
+        <div class="pain-text">
+          <strong>"돈을 벌어도 왜 금방 사라질까?"</strong>
+          열심히 하는데 통장 잔고는 항상 제자리인 이유
+        </div>
+      </div>
+      <div class="pain-card">
+        <span class="pain-icon">🔄</span>
+        <div class="pain-text">
+          <strong>"알면서도 왜 또 같은 행동을 할까?"</strong>
+          작심삼일, 자기방해, 직전에 무너지는 반복 패턴
+        </div>
+      </div>
+      <div class="pain-card">
+        <span class="pain-icon">😶</span>
+        <div class="pain-text">
+          <strong>"나는 왜 이렇게 살고 있는 걸까?"</strong>
+          인생이 내 의지대로 되지 않는 것 같은 막막함
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHY 사주 ── -->
+<section class="why">
+  <div class="wrap">
+    <div class="why-box">
+      <div class="why-quote">
+        사주로 운세를 보는 건 시작일 뿐,<br>진짜는 그 너머에 있습니다.
+      </div>
+      <div class="why-desc">
+        태어난 순간 새겨진 사주는 <strong style="color:var(--text);">올해의 흐름(운세)</strong>을 알려줍니다.<br>
+        하지만 거기서 한 걸음 더 들어가면,<br>
+        그 에너지 패턴이 당신이 평생 반복하는<br>
+        선택과 반응, 감정과 관계를 만들어내고 있죠.<br><br>
+        <strong style="color:var(--text);">라이프코드 해커</strong>는 운세를 읽는 동시에,<br>
+        왜 당신이 같은 연애·돈·습관을 반복하는지<br>
+        그 <strong style="color:var(--text);">무의식의 뿌리</strong>까지 보여드립니다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 차별화 ── -->
+<section class="diff">
+  <div class="wrap">
+    <div class="section-tag">기존 사주와 다른 점</div>
+    <h2 class="section-title" style="margin-bottom:24px;">이건 운세가 아닙니다</h2>
+    <div class="diff-list">
+      <div class="diff-item">
+        <div class="diff-icon">🚫</div>
+        <div class="diff-content">
+          <strong>"귀인을 만납니다" 같은 말 없음</strong>
+          <span>추상적 풀이 대신, 구체적 패턴과 행동 지침을 드립니다.</span>
+        </div>
+      </div>
+      <div class="diff-item">
+        <div class="diff-icon">🧬</div>
+        <div class="diff-content">
+          <strong>연애·돈·습관 3가지 균등하게</strong>
+          <span>한 가지만 깊게 파는 게 아니라 삶 전체 패턴을 분석합니다.</span>
+        </div>
+      </div>
+      <div class="diff-item">
+        <div class="diff-icon">🔮</div>
+        <div class="diff-content">
+          <strong>합충파해 + 무의식 발동 시점</strong>
+          <span>원국뿐 아니라 대운·세운에서 무의식이 언제 터지는지 분석합니다.</span>
+        </div>
+      </div>
+      <div class="diff-item">
+        <div class="diff-icon">⚡</div>
+        <div class="diff-content">
+          <strong>결제 후 이메일로 받는 보고서</strong>
+          <span>상담 예약 없이, 5~10분 내 받아보세요. 지금 바로 신청하세요.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 보고서 미리보기 ── -->
+<section class="preview">
+  <div class="wrap">
+    <div class="section-tag">보고서 구성</div>
+    <h2 class="section-title" style="margin-bottom:8px;">총 13개 섹션, 15장 분량의 깊이</h2>
+    <p class="section-sub" style="margin-bottom:24px;">표지 페이지 + 모바일 최적화 HTML 이메일 + PDF 첨부</p>
+    <div class="preview-list">
+      <div class="preview-item">
+        <div class="preview-check">01</div>
+        <div class="preview-text">표지 페이지 <em>이름, 생년월일, 일련번호가 담긴 격식 있는 표지</em></div>
+      </div>
+      <div class="preview-item">
+        <div class="preview-check">02</div>
+        <div class="preview-text">내 사주 원국과 오행 에너지 지도 <em>시주에서 년주까지 만세력 순으로 정확히</em></div>
+      </div>
+      <div class="preview-item">
+        <div class="preview-check">03</div>
+        <div class="preview-text">인생 핵심 코드 3가지 <em>나라는 사람의 에너지 구조</em></div>
+      </div>
+      <div class="preview-item">
+        <div class="preview-check">04</div>
+        <div class="preview-text">내 사주의 본질 구조와 보충해야 할 에너지 <em>격국과 용신으로 본 라이프스타일 처방</em></div>
+      </div>
+      <div class="preview-item">
+        <div class="preview-check">05</div>
+        <div class="preview-text">연애와 관계 무의식 패턴 <em>왜 같은 연애를 반복하는가</em></div>
+      </div>
+      <div class="preview-item">
+        <div class="preview-check">06</div>
+        <div class="preview-text">돈이 막히는 진짜 이유 <em>재물 무의식 패턴 해킹</em></div>
+      </div>
+      <div class="preview-item">
+        <div class="preview-check">07</div>
+        <div class="preview-text">알면서도 못 바꾸는 것들 <em>습관과 행동의 무의식 작동 방식</em></div>
+      </div>
+      <div class="preview-item">
+        <div class="preview-check">08</div>
+        <div class="preview-text">직업·적성과 건강·체질 코드 <em>오행으로 풀어보는 진로와 신체</em></div>
+      </div>
+      <div class="preview-item">
+        <div class="preview-check">09</div>
+        <div class="preview-text">내 사주에서 충돌하는 에너지 <em>합충파해 갈등 구조 분석</em></div>
+      </div>
+      <div class="preview-item">
+        <div class="preview-check">10</div>
+        <div class="preview-text">가족과 인간관계 자리 해석 <em>부모, 형제, 배우자, 자녀 자리별 패턴</em></div>
+      </div>
+      <div class="preview-item">
+        <div class="preview-check">11</div>
+        <div class="preview-text">지금 나는 어느 흐름에 있는가 <em>현재 대운의 의미와 활용</em></div>
+      </div>
+      <div class="preview-item">
+        <div class="preview-check">12</div>
+        <div class="preview-text">올해와 내년의 무의식 발동 시점 <em>해마다 어떤 흐름이 작동하는지</em></div>
+      </div>
+      <div class="preview-item">
+        <div class="preview-check">13</div>
+        <div class="preview-text">내년 월별 무의식 흐름 캘린더 <em>1월부터 12월까지 매월 안내</em></div>
+      </div>
+      <div class="preview-item">
+        <div class="preview-check">14</div>
+        <div class="preview-text">이번 달 실행 과제 <em>해야 할 것, 하지 말 것, 관찰할 것</em></div>
+      </div>
+      <div class="preview-item">
+        <div class="preview-check">15</div>
+        <div class="preview-text">나만의 정화 선언문 <em>매일 아침 읽는 무의식 정화 문장</em></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 보고서 샘플 미리보기 ── -->
+<section class="sample-preview" style="padding:50px 20px 20px;">
+  <div class="wrap">
+    <div class="section-tag">실제 보고서 샘플</div>
+    <h2 class="section-title" style="margin-bottom:8px;">이런 톤으로 작성됩니다</h2>
+    <p class="section-sub" style="margin-bottom:24px;">아래는 실제 보고서의 한 단락 예시입니다</p>
+
+    <div style="background:linear-gradient(145deg,#12102a,#0e1428);border:1px solid rgba(167,139,250,0.2);border-radius:18px;padding:24px;margin-bottom:18px;">
+      <div style="color:#a78bfa;font-size:12px;letter-spacing:2px;font-weight:700;margin-bottom:10px;">샘플 1. 인생 핵심 코드</div>
+      <p style="color:#d4d4e8;line-height:1.85;font-size:14px;margin:0;">
+        <strong style="color:#e8e0ff;">코드 1. 묵직한 산의 결</strong><br>
+        당신은 흔들리지 않는 큰 산으로 태어났습니다. 천간 중에서 가장 보수적이고 책임감이 강한 글자가 일간에 자리잡고 있어요. 사람들이 당신에게 기대고 싶어 하는 이유, 위기 상황에서 모두가 당신을 찾는 이유가 여기에 있습니다.
+        그런데 흥미로운 건, 당신을 둘러싼 환경은 전혀 다른 결의 에너지로 채워져 있다는 점이에요. 그래서 겉으로는 강하고 안정적이지만 안에서는 끊임없이 흐름과 변화에 적응해야 하는 사람이기도 합니다. 지금까지 이렇게 살아온 것만으로도 충분하다는 말씀을 먼저 드리고 싶어요.
+      </p>
+    </div>
+
+    <div style="background:linear-gradient(145deg,#12102a,#0e1428);border:1px solid rgba(167,139,250,0.2);border-radius:18px;padding:24px;margin-bottom:18px;">
+      <div style="color:#fda4af;font-size:12px;letter-spacing:2px;font-weight:700;margin-bottom:10px;">샘플 2. 연애 무의식 패턴</div>
+      <p style="color:#d4d4e8;line-height:1.85;font-size:14px;margin:0;">
+        당신이 진짜로 끌리는 사람을 만나면 표현이 막히고, 표현이 잘 되는 관계에 들어가면 끌림이 식어요. 이게 반복돼 왔다면 우연이 아닙니다. 무의식 코드가 그렇게 짜여 있어요.
+        진지해질 타이밍에 "내가 나로 있을 수 있는가"를 가장 먼저 체크해 주세요. 못 그러면 그 사람은 아닙니다. 당신은 이미 사랑받을 자격이 충분합니다.
+      </p>
+    </div>
+
+    <div style="background:linear-gradient(145deg,#12102a,#0e1428);border:1px solid rgba(253,186,116,0.2);border-radius:18px;padding:24px;">
+      <div style="color:#fdba74;font-size:12px;letter-spacing:2px;font-weight:700;margin-bottom:10px;">샘플 3. 12개월 월별 캘린더 (1월)</div>
+      <p style="color:#d4d4e8;line-height:1.85;font-size:14px;margin:0;">
+        <strong style="color:#e8e0ff;">1월 - 한 호흡 고르는 달</strong><br>
+        내년 1월은 당신의 일간과 만나면 한 박자 늦추라는 신호를 보내는 달입니다. 빠른 결정보다 한 주 정도 묵혀두고 다시 보는 습관이 도움이 됩니다. 새해 결심을 늦게 시작해도 괜찮습니다. 진짜 흐름은 2월부터 잡힙니다.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ── 신청 폼 ── -->
+<section id="form-section">
+  <div class="wrap">
+    <div class="form-box">
+      <h2 class="form-title">지금 내 패턴 분석 신청하기</h2>
+      <p class="form-sub">정보를 입력하고 결제하면 5~10분 내 이메일로 발송됩니다</p>
+
+      <div class="price-tag">
+        <span class="price">₩8,900</span>
+        <span class="price-desc">· 결제 후 5~10분 내 이메일 발송</span>
+      </div>
+
+      <form id="saju-form">
+        <div class="form-group">
+          <label>이름</label>
+          <input type="text" id="name" name="name" placeholder="홍길동" required autocomplete="name">
+        </div>
+
+        <div class="form-group">
+          <label>이메일 <span style="color:var(--purple)">*보고서 받을 이메일</span></label>
+          <input type="email" id="email" name="email" placeholder="example@email.com" required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label>생년월일</label>
+          <div class="form-row">
+            <input type="number" id="birth-year" name="birth_year" placeholder="1990" min="1930" max="2010" required>
+            <div class="form-row" style="grid-template-columns:1fr 1fr;">
+              <input type="number" id="birth-month" name="birth_month" placeholder="월" min="1" max="12" required>
+              <input type="number" id="birth-day" name="birth_day" placeholder="일" min="1" max="31" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>양력 / 음력</label>
+          <div class="lunar-toggle">
+            <button type="button" class="lunar-btn active" id="btn-solar" onclick="setCalendar('solar')">양력</button>
+            <button type="button" class="lunar-btn" id="btn-lunar" onclick="setCalendar('lunar')">음력</button>
+          </div>
+          <input type="hidden" id="is-lunar" name="is_lunar" value="false">
+        </div>
+
+        <div class="form-group">
+          <label>출생시간 <span style="color:var(--muted);font-weight:400">(모르면 '모름' 선택)</span></label>
+          <select id="birth-hour" name="birth_hour" required>
+            <option value="">출생시간을 선택하세요</option>
+            <option value="-1">모름 (오시 12:00 적용)</option>
+            <option value="0">자시 (子時) KST 23:30 - 01:30</option>
+            <option value="2">축시 (丑時) KST 01:30 - 03:30</option>
+            <option value="4">인시 (寅時) KST 03:30 - 05:30</option>
+            <option value="6">묘시 (卯時) KST 05:30 - 07:30</option>
+            <option value="8">진시 (辰時) KST 07:30 - 09:30</option>
+            <option value="10">사시 (巳時) KST 09:30 - 11:30</option>
+            <option value="12">오시 (午時) KST 11:30 - 13:30</option>
+            <option value="14">미시 (未時) KST 13:30 - 15:30</option>
+            <option value="16">신시 (申時) KST 15:30 - 17:30</option>
+            <option value="18">유시 (酉時) KST 17:30 - 19:30</option>
+            <option value="20">술시 (戌時) KST 19:30 - 21:30</option>
+            <option value="22">해시 (亥時) KST 21:30 - 23:30</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>성별</label>
+          <div class="lunar-toggle">
+            <button type="button" class="lunar-btn active" id="btn-male" onclick="setGender('M')">남성</button>
+            <button type="button" class="lunar-btn" id="btn-female" onclick="setGender('F')">여성</button>
+          </div>
+          <input type="hidden" id="gender" name="gender" value="M">
+        </div>
+
+        <div class="form-group">
+          <label>태어난 도시 <span style="color:var(--muted);font-weight:400">(입력하면 타고난 기질까지 더 정밀하게 분석)</span></label>
+          <input type="text" id="birth-city" name="birth_city" placeholder="예: 서울, 부산, 대구 (모르면 비워두세요)" autocomplete="off">
+        </div>
+
+        <!-- ── 청약철회 제한 고지 + 동의 (전자상거래법 제17조②5호) ── -->
+        <div class="consent-box">
+          <div class="consent-title">환불·청약철회 안내</div>
+          <ul class="consent-list">
+            <li>본 상품은 주문 즉시 개별 제작되는 <strong>개인 맞춤형 디지털 콘텐츠</strong>입니다.</li>
+            <li>보고서가 이메일로 <strong>발송되기 전</strong>까지는 전액 환불이 가능합니다.</li>
+            <li>보고서가 <strong>발송된 이후</strong>에는 콘텐츠의 특성상 청약철회(환불)가 제한됩니다.</li>
+            <li>위 화면의 <strong>샘플 보고서 미리보기</strong>로 콘텐츠 형식을 미리 확인하실 수 있습니다.</li>
+            <li>시스템 오류로 보고서가 정상 발송되지 않은 경우에는 결제가 <strong>자동으로 취소(환불)</strong>됩니다.</li>
+          </ul>
+          <label class="consent-check">
+            <input type="checkbox" id="consent" name="consent">
+            <span>위 환불 정책을 확인했으며, 발송 후 청약철회가 제한되는 것에 <strong>동의합니다.</strong> (필수)</span>
+          </label>
+        </div>
+
+        <div class="form-group" style="margin-top:14px;">
+          <label style="font-size:12px;color:var(--muted);">체험 코드 <span style="font-weight:400">(있는 경우에만 입력 · 없으면 비워두세요)</span></label>
+          <input type="text" id="free-code" name="free_code" placeholder="예: LCHK-FREE-XXXXXX" autocomplete="off"
+                 style="text-transform:uppercase;">
+        </div>
+
+        <button type="submit" class="submit-btn" id="submit-btn">
+          ₩8,900 결제하고 보고서 받기 →
+        </button>
+
+        <p class="form-notice">
+          결제는 토스페이먼츠로 안전하게 처리됩니다.<br>
+          보고서는 입력한 이메일로 <strong>5-10분 내</strong> 발송됩니다.<br>
+          <span style="color:#555577">발송 전까지 환불 가능 · 발송 후에는 환불이 제한됩니다.</span>
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ── -->
+<section class="faq">
+  <div class="wrap">
+    <div class="section-tag">자주 묻는 질문</div>
+    <h2 class="section-title" style="margin-bottom:28px;">FAQ</h2>
+    <div class="faq-item">
+      <div class="faq-q">출생시간을 모르면 어떻게 하나요?</div>
+      <div class="faq-a">'모름'을 선택하시면 오시(午時, 정오 12시)로 적용됩니다. 시주가 없어도 년·월·일주만으로 의미 있는 분석이 가능합니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">보고서는 언제 받나요?</div>
+      <div class="faq-a">결제 완료 후 AI가 개인 맞춤 분석을 생성하므로 5~10분 내에 이메일로 발송됩니다. 스팸함도 확인해 주세요.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">음력 생일이면 어떻게 입력하나요?</div>
+      <div class="faq-a">'음력'을 선택하고 음력 날짜를 입력하시면 시스템이 자동으로 양력으로 변환해 사주를 계산합니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">일반 사주 앱이랑 어떻게 다른가요?</div>
+      <div class="faq-a">일반 사주 앱은 운세를 알려줍니다. 라이프코드 해커는 왜 당신이 같은 연애, 돈 문제, 습관을 반복하는지 그 무의식의 뿌리를 파고듭니다. 추상적 풀이가 아닌 구체적 행동 지침까지 제공합니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">환불이 되나요?</div>
+      <div class="faq-a">보고서는 개인 맞춤 디지털 콘텐츠 특성상, 이메일 발송 이후에는 환불이 어렵습니다. 발송 전 문의는 DM으로 연락해 주세요.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 푸터 ── -->
+<footer>
+  <strong>⟨ 라이프코드 해커 ⟩</strong><br>
+  사주명리학 × 무의식 정화<br>
+  문의: 스레드 DM<br>
+  <br>
+  <span style="color:#2a2a3a">© 2026 라이프코드 해커. All rights reserved.</span>
+</footer>
+
+<!-- ── 로딩 오버레이 ── -->
+<div id="loading">
+  <div class="loading-spinner"></div>
+  <div class="loading-title">보고서를 생성 중입니다</div>
+  <div class="loading-sub">AI가 사주를 분석하고 있어요</div>
+  <div class="loading-steps">
+    <div class="loading-step active" id="step1">📋 만세력 계산 중...</div>
+    <div class="loading-step" id="step2">🧬 무의식 패턴 분석 중...</div>
+    <div class="loading-step" id="step3">✉️ 이메일 발송 준비 중...</div>
+  </div>
+</div>
+
+<!-- ── 성공 ── -->
+<div id="success">
+  <div class="success-icon">✅</div>
+  <div class="success-title">접수 완료!</div>
+  <div class="success-sub">아래 이메일로 <strong>5~10분 내</strong><br>보고서를 보내드릴게요.</div>
+  <div class="success-email" id="success-email"></div>
+  <div style="font-size:13px;color:var(--muted);line-height:1.8;">
+    📧 스팸함도 꼭 확인해 주세요.<br>
+    10분 이상 지나도 오지 않으면 DM으로 문의해 주세요.
+  </div>
+</div>
+
+<!-- ── 토스페이먼츠 SDK ── -->
+<script src="https://js.tosspayments.com/v2/standard"></script>
+<script>
+// ── 상태 관리 ──
+let selectedCalendar = 'solar';
+let selectedGender = 'M';
+
+function setCalendar(type) {
+  selectedCalendar = type;
+  document.getElementById('is-lunar').value = (type === 'lunar').toString();
+  document.getElementById('btn-solar').classList.toggle('active', type === 'solar');
+  document.getElementById('btn-lunar').classList.toggle('active', type === 'lunar');
+}
+
+function setGender(g) {
+  selectedGender = g;
+  document.getElementById('gender').value = g;
+  document.getElementById('btn-male').classList.toggle('active', g === 'M');
+  document.getElementById('btn-female').classList.toggle('active', g === 'F');
+}
+
+// ── 로딩 스텝 애니메이션 ──
+function animateLoadingSteps() {
+  const steps = ['step1', 'step2', 'step3'];
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i > 0) {
+      document.getElementById(steps[i - 1]).classList.remove('active');
+      document.getElementById(steps[i - 1]).classList.add('done');
+      document.getElementById(steps[i - 1]).textContent =
+        ['✅ 만세력 계산 완료', '✅ 분석 완료', '✅ 이메일 발송 중'][i - 1];
+    }
+    if (i < steps.length) {
+      document.getElementById(steps[i]).classList.add('active');
+      i++;
+    } else {
+      clearInterval(interval);
+    }
+  }, 3000);
+}
+
+// ── 폼 제출 ──
+document.getElementById('saju-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const year = parseInt(document.getElementById('birth-year').value);
+  const month = parseInt(document.getElementById('birth-month').value);
+  const day = parseInt(document.getElementById('birth-day').value);
+  const hourRaw = document.getElementById('birth-hour').value;
+  const hour = parseInt(hourRaw) === -1 ? 11 : parseInt(hourRaw);
+  const isLunar = document.getElementById('is-lunar').value === 'true';
+  const gender = document.getElementById('gender').value;
+  const city = document.getElementById('birth-city').value.trim();
+
+  // 기본 유효성 검사
+  if (!name || !email || !year || !month || !day || hourRaw === '') {
+    alert('모든 항목을 입력해 주세요.');
+    return;
+  }
+  if (year < 1930 || year > 2010) {
+    alert('생년도를 다시 확인해 주세요.');
+    return;
+  }
+  // 청약철회 제한 동의 (전자상거래법 필수)
+  if (!document.getElementById('consent').checked) {
+    alert('환불·청약철회 안내에 동의하셔야 결제를 진행할 수 있습니다.');
+    document.querySelector('.consent-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  // ── 지인 무료 체험 코드 분기 (코드 입력 시 결제 없이 발송) ──
+  const freeCode = (document.getElementById('free-code').value || '').trim();
+  if (freeCode) {
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    document.getElementById('loading').classList.add('show');
+    if (typeof animateLoadingSteps === 'function') animateLoadingSteps();
+    try {
+      const res = await fetch('/api/free-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: freeCode, name, email, year, month, day, hour, minute: 0, gender, is_lunar: isLunar, city })
+      });
+      const result = await res.json();
+      document.getElementById('loading').classList.remove('show');
+      if (res.ok && result.success) {
+        document.getElementById('success-email').textContent = email;
+        document.getElementById('success').classList.add('show');
+      } else {
+        alert(result.error || '체험 보고서 발송에 실패했습니다.');
+        btn.disabled = false;
+      }
+    } catch (err) {
+      document.getElementById('loading').classList.remove('show');
+      alert('네트워크 오류가 발생했습니다. 다시 시도해 주세요.');
+      btn.disabled = false;
+    }
+    return;
+  }
+
+  const submitBtn = document.getElementById('submit-btn');
+  submitBtn.disabled = true;
+
+  // 주문 ID 생성
+  const orderId = 'LCHK-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+
+  // 사용자 정보 sessionStorage에 저장 (결제 후 사용)
+  sessionStorage.setItem('saju_order', JSON.stringify({
+    orderId, name, email, year, month, day, hour,
+    minute: 0, gender, is_lunar: isLunar, city
+  }));
+
+  try {
+    // 토스페이먼츠 결제 요청
+    const tossPayments = TossPayments('{{ toss_client_key }}');
+    const payment = tossPayments.payment({ customerKey: email });
+
+    await payment.requestPayment({
+      method: 'CARD',
+      amount: { currency: 'KRW', value: 8900 },
+      orderId: orderId,
+      orderName: '라이프코드 해커 — 사주 무의식 패턴 보고서',
+      customerEmail: email,
+      customerName: name,
+      successUrl: window.location.origin + '/payment/success',
+      failUrl: window.location.origin + '/payment/fail',
+    });
+  } catch (err) {
+    console.error('결제 오류:', err);
+    if (err.code !== 'USER_CANCEL') {
+      alert('결제 중 오류가 발생했습니다. 다시 시도해 주세요.');
+    }
+    submitBtn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

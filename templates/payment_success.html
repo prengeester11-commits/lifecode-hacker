@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>결제 처리 중 — 라이프코드 해커</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:#07070f;color:#e8e8f4;
+  font-family:'Noto Sans KR',-apple-system,sans-serif;
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:40px 20px;
+}
+.box{max-width:400px;}
+.spinner{
+  width:56px;height:56px;margin:0 auto 28px;
+  border:3px solid rgba(167,139,250,0.2);
+  border-top-color:#a78bfa;border-radius:50%;
+  animation:spin 0.8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+h1{font-size:22px;font-weight:900;color:#fff;margin-bottom:10px;}
+p{font-size:14px;color:#8888aa;line-height:1.8;}
+.steps{margin-top:28px;display:flex;flex-direction:column;gap:10px;text-align:left;}
+.step{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:12px;padding:14px 16px;
+  font-size:14px;color:#8888aa;
+}
+.step.active{color:#fff;border-color:rgba(167,139,250,0.3);}
+.step.done{color:#4ade80;border-color:rgba(74,222,128,0.2);}
+.step-icon{font-size:18px;flex-shrink:0;}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="spinner" id="spinner"></div>
+  <h1 id="title">결제를 확인하고 있습니다</h1>
+  <p id="desc">AI가 사주를 분석하고 있어요.<br>잠시만 기다려 주세요.</p>
+  <div class="steps">
+    <div class="step active" id="s1"><span class="step-icon">💳</span>결제 확인 중...</div>
+    <div class="step" id="s2"><span class="step-icon">📋</span>만세력 계산 중...</div>
+    <div class="step" id="s3"><span class="step-icon">🧬</span>무의식 패턴 분석 중...</div>
+    <div class="step" id="s4"><span class="step-icon">✉️</span>이메일 발송 중...</div>
+  </div>
+</div>
+<script>
+(async function() {
+  const params = new URLSearchParams(location.search);
+  const paymentKey = params.get('paymentKey');
+  const orderId    = params.get('orderId');
+  const amount     = params.get('amount');
+
+  if (!paymentKey || !orderId || !amount) {
+    document.getElementById('title').textContent = '잘못된 접근입니다';
+    document.getElementById('desc').textContent  = '다시 시도해 주세요.';
+    document.getElementById('spinner').style.display = 'none';
+    return;
+  }
+
+  // 저장된 주문 정보 로드
+  const orderData = JSON.parse(sessionStorage.getItem('saju_order') || '{}');
+
+  function setStep(n) {
+    for (let i = 1; i <= 4; i++) {
+      const el = document.getElementById('s' + i);
+      el.className = 'step ' + (i < n ? 'done' : i === n ? 'active' : '');
+    }
+    const icons = ['💳','📋','🧬','✉️'];
+    const labels = [
+      '✅ 결제 확인 완료',
+      '✅ 만세력 계산 완료',
+      '✅ 분석 완료',
+      '✅ 이메일 발송 완료'
+    ];
+    for (let i = 1; i < n; i++) {
+      document.getElementById('s' + i).querySelector('.step-icon').textContent = '✅';
+      document.getElementById('s' + i).lastChild.textContent = labels[i - 1].replace('✅ ', '');
+    }
+  }
+
+  try {
+    setStep(1);
+    await new Promise(r => setTimeout(r, 800));
+    setStep(2);
+
+    // 백엔드에 결제 확인 + 보고서 생성 요청
+    const response = await fetch('/api/payment/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        paymentKey,
+        orderId,
+        amount: parseInt(amount),
+        ...orderData
+      })
+    });
+
+    setStep(3);
+    await new Promise(r => setTimeout(r, 1500));
+    setStep(4);
+
+    const result = await response.json();
+
+    if (!response.ok || result.error) {
+      throw new Error(result.error || '처리 중 오류가 발생했습니다.');
+    }
+
+    await new Promise(r => setTimeout(r, 1000));
+
+    // 성공 화면
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('title').textContent = '🎉 결제 완료!';
+    document.getElementById('desc').innerHTML =
+      `<strong style="color:#fff">${result.email}</strong><br>으로 <strong style="color:#fff">5~10분 내</strong> 보고서를 보내드립니다.<br><br>` +
+      `스팸함도 꼭 확인해 주세요.<br>10분 이상 지나도 오지 않으면<br>스레드 DM으로 문의해 주세요.`;
+
+    sessionStorage.removeItem('saju_order');
+
+  } catch (err) {
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('title').textContent = '오류가 발생했습니다';
+    document.getElementById('desc').innerHTML =
+      err.message + '<br><br>스레드 DM으로 문의해 주세요.';
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+flask==3.0.3
+python-dotenv==1.0.1
+openai>=1.55.0
+requests==2.32.3
+korean-lunar-calendar==0.3.1
+gunicorn==22.0.0
+ephem>=4.1.5
+Pillow>=10.0.0
+# PDF 변환 (보고서 첨부용) - WeasyPrint가 1순위, xhtml2pdf가 fallback
+weasyprint==62.3
+xhtml2pdf==0.2.16
