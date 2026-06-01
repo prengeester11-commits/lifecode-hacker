@@ -220,6 +220,28 @@ def _get_sipsin(ilgan: int, target_stem: int) -> str:
     return '?'
 
 
+def get_gyeokguk(ilgan: int, wol_branch: int) -> dict:
+    """
+    격국(格局) 판정 — 월지(月支) 본기의 십신을 기준으로 한다.
+    (왕지/표준 케이스에 정확. 비견/겁재는 건록격/양인격으로.)
+    무자일주 월지 酉(본기 辛) → 무토 기준 상관 → 상관격. (검증 케이스)
+    """
+    bongi = JIJI_BONGI[wol_branch]
+    sipsin = _get_sipsin(ilgan, bongi)
+    name_map = {
+        '비견': '건록격', '겁재': '양인격',
+        '식신': '식신격', '상관': '상관격',
+        '편재': '편재격', '정재': '정재격',
+        '편관': '편관격', '정관': '정관격',
+        '편인': '편인격', '정인': '정인격',
+    }
+    return {
+        'sipsin': sipsin,
+        'name': name_map.get(sipsin, '특수격'),
+        'wol_bongi': CHEONGAN[bongi],
+    }
+
+
 def _calc_ohaeng(pillars: List[Pillar]) -> Tuple[Dict, Dict]:
     """오행 분포 계산 (기본 + 지장간 가중치)"""
     count = {oh: 0 for oh in OHAENG}
@@ -602,6 +624,9 @@ def saju_to_dict(result: SajuResult) -> dict:
     #    (GPT가 추측하다 틀리는 것을 방지: 천간=그대로, 지지=본기 기준)
     ilg = result.ilgan
 
+    # 격국(월지 본기 기준) — GPT 추측 방지
+    gyeokguk = get_gyeokguk(result.ilgan, result.wol_ju.branch)
+
     def _sipsin_pair(stem, branch):
         return _get_sipsin(ilg, stem), _get_sipsin(ilg, JIJI_BONGI[branch])
 
@@ -639,6 +664,8 @@ def saju_to_dict(result: SajuResult) -> dict:
             'strength_label': '신강(身强)' if result.is_strong else '신약(身弱)',
             'strength_detail': result.strength_detail,
         },
+
+        'gyeokguk': gyeokguk,
 
         'ohaeng': {
             oh: {
