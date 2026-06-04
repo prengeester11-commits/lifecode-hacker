@@ -10,6 +10,7 @@ import requests
 from datetime import datetime, date
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify, render_template, abort
+from flask_cors import CORS
 
 
 def _make_serial_no(name: str, email: str) -> str:
@@ -30,6 +31,13 @@ from refund import cancel_payment, get_payment_key_by_order_id
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'lifecoder-hacker-dev-key')
+
+# ── CORS: Netlify 도메인 + 로컬 개발 허용 ──
+_ALLOWED_ORIGINS = [o.strip() for o in os.environ.get(
+    'ALLOWED_ORIGINS',
+    'https://dapper-praline-c90ab1.netlify.app,http://localhost:5000,http://127.0.0.1:5000'
+).split(',') if o.strip()]
+CORS(app, resources={r"/api/*": {"origins": _ALLOWED_ORIGINS}})
 
 TOSS_SECRET_KEY  = os.environ.get('TOSS_SECRET_KEY', '')
 TOSS_CLIENT_KEY  = os.environ.get('TOSS_CLIENT_KEY', '')

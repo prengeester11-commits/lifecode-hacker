@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>라이프코드 해커 — 사주 운세 + 무의식 분석을 한 번에</title>
 <meta name="description" content="사주 운세도 보고, 반복되는 무의식 패턴까지 한 번에. 올해 흐름은 기본, 연애·돈·습관이 왜 반복되는지 그 뿌리까지 분석합니다. 8,900원, 5~10분 내 이메일 발송.">
 <meta property="og:title" content="라이프코드 해커 — 사주 운세 + 무의식, 한 번에">
@@ -272,7 +272,7 @@ input,select{
   border:1px solid rgba(255,255,255,0.1);
   border-radius:12px;
   color:var(--text);
-  font-size:15px;
+  font-size:16px;
   font-family:inherit;
   padding:14px 16px;
   outline:none;
@@ -425,6 +425,68 @@ footer strong{color:#6b6b8a;}
   border:1px solid rgba(74,222,128,0.25);
   border-radius:12px;padding:14px 20px;
   font-size:15px;color:var(--green);font-weight:700;
+}
+
+/* ── 모바일 반응형 ── */
+@media (max-width: 430px) {
+  :root { --max-w: 100%; }
+
+  /* 네비: 브랜드명 줄이기 */
+  .nav-brand { font-size:13px; }
+  .nav-cta   { font-size:12px; padding:7px 13px; }
+  nav        { padding:12px 16px; }
+
+  /* 히어로 */
+  .hero { padding:100px 16px 64px; }
+  .hero-badge { font-size:11px; padding:5px 12px; letter-spacing:1px; }
+  .hero-cta { font-size:15px; padding:16px 28px; border-radius:14px; }
+  .hero-desc { font-size:14px; }
+
+  /* 스탯 */
+  .stats { margin:32px 16px; }
+  .stat  { padding:16px 8px; }
+  .stat-num   { font-size:18px; }
+  .stat-label { font-size:10px; }
+
+  /* 섹션 공통 패딩 */
+  .pain, .why, .diff, .preview, .faq { padding:48px 16px; }
+  #form-section { padding:48px 16px 64px; }
+
+  /* 공감 카드 */
+  .pain-card { padding:16px; gap:12px; }
+  .pain-icon { font-size:20px; }
+  .pain-text { font-size:14px; }
+
+  /* 차별화 */
+  .diff-item { padding:16px; gap:12px; }
+  .diff-icon { width:36px; height:36px; font-size:17px; border-radius:10px; }
+
+  /* 보고서 구성 */
+  .preview-item { padding:13px 14px; gap:10px; }
+  .preview-check{ width:22px; height:22px; font-size:11px; }
+  .preview-text { font-size:13px; }
+
+  /* 폼 박스 */
+  .form-box { padding:24px 16px; border-radius:18px; }
+  .form-title { font-size:18px; }
+  .price-tag .price { font-size:20px; }
+  .price-tag .price-desc { font-size:12px; }
+  label { font-size:12px; }
+
+  /* 제출 버튼 */
+  .submit-btn { font-size:16px; padding:17px; }
+
+  /* 동의 박스 */
+  .consent-box { padding:14px 14px; }
+  .consent-list li { font-size:12px; }
+  .consent-check span { font-size:12px; }
+
+  /* FAQ */
+  .faq-q { font-size:14px; }
+  .faq-a { font-size:13px; }
+
+  /* 샘플 보고서 */
+  .sample-preview { padding:40px 16px 16px; }
 }
 </style>
 </head>
@@ -704,12 +766,10 @@ footer strong{color:#6b6b8a;}
 
         <div class="form-group">
           <label>생년월일</label>
-          <div class="form-row">
-            <input type="number" id="birth-year" name="birth_year" placeholder="1990" min="1930" max="2010" required>
-            <div class="form-row" style="grid-template-columns:1fr 1fr;">
-              <input type="number" id="birth-month" name="birth_month" placeholder="월" min="1" max="12" required>
-              <input type="number" id="birth-day" name="birth_day" placeholder="일" min="1" max="31" required>
-            </div>
+          <input type="number" id="birth-year" name="birth_year" placeholder="출생년도 (예: 1990)" min="1930" max="2010" required style="margin-bottom:10px;">
+          <div class="form-row" style="grid-template-columns:1fr 1fr;">
+            <input type="number" id="birth-month" name="birth_month" placeholder="월 (1~12)" min="1" max="12" required>
+            <input type="number" id="birth-day" name="birth_day" placeholder="일 (1~31)" min="1" max="31" required>
           </div>
         </div>
 
