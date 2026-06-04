@@ -222,41 +222,41 @@ def generate_report_sections(saju_data: dict, astro_context: str = '') -> dict:
     if astro_context:
         context = context + '\n' + astro_context
 
-    sections = {}
-
     # 섹션별 프롬프트 정의 (총 13개)
     prompts = [
         ('intro',        _prompt_intro(context)),
-        ('gyeokguk',     _prompt_gyeokguk(context, saju_data)),   # 신설: 본질 구조·보충 기운
+        ('gyeokguk',     _prompt_gyeokguk(context, saju_data)),
         ('love',         _prompt_love(context)),
         ('money',        _prompt_money(context)),
         ('habit',        _prompt_habit(context)),
-        ('career',       _prompt_career(context)),         # 신설: 직업·건강
+        ('career',       _prompt_career(context)),
         ('hapchung',     _prompt_hapchung(context)),
-        ('family',       _prompt_family(context)),         # 신설: 가족·관계
+        ('family',       _prompt_family(context)),
         ('daewoon',      _prompt_daewoon(context, saju_data)),
         ('sewoon',       _prompt_sewoon(context, saju_data)),
-        ('calendar',     _prompt_calendar(context, saju_data)),   # 신설: 12개월 캘린더
+        ('calendar',     _prompt_calendar(context, saju_data)),
         ('action',       _prompt_action(context)),
         ('purification', _prompt_purification(context)),
     ]
 
-    # 캘린더 등 장문 섹션은 토큰 한도를 넉넉히 (1800은 한글 장문에서 잘림)
     long_sections = {'calendar', 'gyeokguk', 'career'}
-    # [희망] 마커(알아차림→현실 변화 메시지)를 넣을 섹션 (중간중간 흥미·희망 유지)
     hope_sections = {'intro', 'love', 'money', 'habit', 'daewoon', 'action'}
-    # 박스·색강조를 넣지 않는 섹션 (정화 선언문은 깨끗한 선언만)
     no_engage = {'purification'}
 
-    for section_key, user_prompt in prompts:
+    def _build_and_run(item):
+        section_key, user_prompt = item
         max_tokens = 3400 if section_key in long_sections else 2400
-        if section_key in no_engage:
-            full_prompt = user_prompt
-        else:
-            full_prompt = user_prompt + _engage_suffix(section_key in hope_sections)
+        full_prompt = user_prompt if section_key in no_engage else user_prompt + _engage_suffix(section_key in hope_sections)
         text = _generate_one_section(section_key, full_prompt, max_tokens)
-        # 마크다운(##, **, 박스 마커)을 이메일용 HTML로 변환
-        sections[section_key] = _markdown_to_html(text)
+        return section_key, _markdown_to_html(text)
+
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    sections = {}
+    with ThreadPoolExecutor(max_workers=13) as executor:
+        futures = {executor.submit(_build_and_run, item): item[0] for item in prompts}
+        for future in as_completed(futures):
+            key, html_text = future.result()  # 예외는 그대로 전파 → 자동 환불 트리거
+            sections[key] = html_text
 
     return sections
 
