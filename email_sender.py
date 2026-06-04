@@ -113,14 +113,19 @@ def send_report_email(
 
     msg.attach(related)
 
-    # ── PDF용 HTML: cid 참조를 data:URI로 치환 (WeasyPrint는 cid를 못 읽음) ──
-    pdf_source_html = html_content
-    if image_bytes:
-        data_uri = 'data:image/jpeg;base64,' + base64.b64encode(image_bytes).decode()
-        pdf_source_html = html_content.replace(f'cid:{image_cid}', data_uri)
-
-    # ── PDF 첨부 (변환 성공 시에만) ──
-    pdf_bytes = html_to_pdf_bytes(pdf_source_html)
+    # ── PDF 첨부 ──
+    # Render 무료 플랜(512MB)에서는 PDF 변환이 메모리를 크게 먹어 워커가 죽을 수 있다.
+    # DISABLE_PDF=true 면 PDF를 건너뛰고 HTML 본문만 발송(보고서 핵심은 HTML).
+    pdf_bytes = None
+    if os.environ.get('DISABLE_PDF', '').lower() == 'true':
+        log.info('DISABLE_PDF=true → PDF 변환 생략, HTML 본문만 발송')
+    else:
+        # cid 참조를 data:URI로 치환 (WeasyPrint는 cid를 못 읽음)
+        pdf_source_html = html_content
+        if image_bytes:
+            data_uri = 'data:image/jpeg;base64,' + base64.b64encode(image_bytes).decode()
+            pdf_source_html = html_content.replace(f'cid:{image_cid}', data_uri)
+        pdf_bytes = html_to_pdf_bytes(pdf_source_html)
     if pdf_bytes:
         if not pdf_filename:
             safe_name = ''.join(c for c in to_name if c.isalnum() or c in '_-')

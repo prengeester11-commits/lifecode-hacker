@@ -250,16 +250,20 @@ def generate_report_sections(saju_data: dict, astro_context: str = '') -> dict:
         text = _generate_one_section(section_key, full_prompt, max_tokens)
         return section_key, _markdown_to_html(text)
 
-    # 동시 실행 개수 제한: OpenAI 분당 토큰 한도(TPM)를 넘지 않도록.
-    # 13개를 한꺼번에 쏘면 30,000 TPM을 초과해 429 에러가 난다.
+    # 동시 실행 개수 제한: OpenAI 분당 토큰 한도(TPM 30,000)와
+    # Render 무료 플랜 메모리(512MB)를 동시에 넘지 않도록 2개로 제한.
+    # (3개면 피크 토큰/메모리가 한도를 살짝 넘겨 429 또는 OOM 위험)
     from concurrent.futures import ThreadPoolExecutor, as_completed
     sections = {}
-    with ThreadPoolExecutor(max_workers=3) as executor:
+    log.info(f'보고서 섹션 생성 시작: {len(prompts)}개 (동시 2)')
+    with ThreadPoolExecutor(max_workers=2) as executor:
         futures = {executor.submit(_build_and_run, item): item[0] for item in prompts}
         for future in as_completed(futures):
             key, html_text = future.result()  # 예외는 그대로 전파 → 자동 환불 트리거
             sections[key] = html_text
+            log.info(f"섹션 완료: {key} ({len(sections)}/{len(prompts)})")
 
+    log.info('모든 섹션 생성 완료')
     return sections
 
 

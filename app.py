@@ -301,10 +301,16 @@ def _build_and_send_report(data: dict):
             astro_context = ''
 
     # ── GPT 보고서 섹션 생성 ──
+    app.logger.info(f'[보고서] 섹션 생성 시작: {data.get("email")}')
     sections = generate_report_sections(saju_data, astro_context=astro_context)
 
     # ── 사주 상징 이미지 + 표지 헤드라인 (실패해도 보고서는 진행) ──
-    persona_image = generate_persona_image(saju_data)
+    app.logger.info('[보고서] 상징 이미지 생성 시작')
+    try:
+        persona_image = generate_persona_image(saju_data)
+    except Exception as e:
+        app.logger.warning(f'[보고서] 상징 이미지 실패(생략): {e}')
+        persona_image = None
     cover_line = generate_cover_line(saju_data)
 
     # ── HTML 이메일 렌더링 ──
@@ -330,12 +336,14 @@ def _build_and_send_report(data: dict):
     )
 
     # ── 이메일 발송 ──
+    app.logger.info(f'[보고서] 이메일 발송 시작: {data.get("email")}')
     send_report_email(
         to_email=data['email'],
         to_name=data['name'],
         html_content=html_content,
         image_bytes=persona_image,
     )
+    app.logger.info(f'[보고서] 이메일 발송 완료: {data.get("email")}')
 
 
 def _refund_and_respond(payment_key: str, order_id: str, error_detail: str):
