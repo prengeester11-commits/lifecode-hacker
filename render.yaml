@@ -28,5 +28,3 @@ services:
         value: "3.12.7"
       - key: ALLOWED_ORIGINS
         value: "https://dapper-praline-c90ab1.netlify.app"
-      - key: DISABLE_PDF
-        value: "true"

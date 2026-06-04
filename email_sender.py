@@ -115,10 +115,11 @@ def send_report_email(
 
     # ── PDF 첨부 ──
     # Render 무료 플랜(512MB)에서는 PDF 변환이 메모리를 크게 먹어 워커가 죽을 수 있다.
-    # DISABLE_PDF=true 면 PDF를 건너뛰고 HTML 본문만 발송(보고서 핵심은 HTML).
+    # 그래서 기본은 PDF 생략(HTML 본문만 발송). 보고서 핵심은 HTML이라 영향 없음.
+    # 메모리 여유가 있는 환경에서 PDF를 원하면 ENABLE_PDF=true 로 켤 수 있다.
     pdf_bytes = None
-    if os.environ.get('DISABLE_PDF', '').lower() == 'true':
-        log.info('DISABLE_PDF=true → PDF 변환 생략, HTML 본문만 발송')
+    if os.environ.get('ENABLE_PDF', '').lower() != 'true':
+        log.info('PDF 변환 생략(기본값) → HTML 본문만 발송')
     else:
         # cid 참조를 data:URI로 치환 (WeasyPrint는 cid를 못 읽음)
         pdf_source_html = html_content
