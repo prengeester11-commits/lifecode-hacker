@@ -250,9 +250,11 @@ def generate_report_sections(saju_data: dict, astro_context: str = '') -> dict:
         text = _generate_one_section(section_key, full_prompt, max_tokens)
         return section_key, _markdown_to_html(text)
 
+    # 동시 실행 개수 제한: OpenAI 분당 토큰 한도(TPM)를 넘지 않도록.
+    # 13개를 한꺼번에 쏘면 30,000 TPM을 초과해 429 에러가 난다.
     from concurrent.futures import ThreadPoolExecutor, as_completed
     sections = {}
-    with ThreadPoolExecutor(max_workers=13) as executor:
+    with ThreadPoolExecutor(max_workers=3) as executor:
         futures = {executor.submit(_build_and_run, item): item[0] for item in prompts}
         for future in as_completed(futures):
             key, html_text = future.result()  # 예외는 그대로 전파 → 자동 환불 트리거
@@ -321,7 +323,8 @@ def _generate_one_section(section_key: str, user_prompt: str, max_tokens: int) -
     => 깨진 보고서를 고객에게 발송하지 않는 것이 환불 정책상 안전.
     """
     last_err = None
-    for attempt in range(3):
+    max_attempts = 6
+    for attempt in range(max_attempts):
         try:
             response = client.chat.completions.create(
                 model='gpt-4o',
@@ -338,10 +341,38 @@ def _generate_one_section(section_key: str, user_prompt: str, max_tokens: int) -
             return _strip_disallowed_symbols(text)
         except Exception as e:
             last_err = e
-            if attempt < 2:
-                time.sleep(1.5 * (attempt + 1))  # 1.5s, 3s 백오프
-    # 3회 모두 실패 → 예외 전파 (자동 환불 트리거)
+            if attempt >= max_attempts - 1:
+                break
+            # 429(분당 토큰 한도) 에러는 더 길게 기다렸다 재시도
+            if _is_rate_limit(e):
+                wait = _retry_after_seconds(e) or min(20.0, 4.0 * (attempt + 1))
+                log.warning(f"섹션 '{section_key}' 429 재시도 {attempt+1}/{max_attempts}, {wait:.1f}s 대기")
+                time.sleep(wait)
+            else:
+                time.sleep(1.5 * (attempt + 1))  # 일반 오류: 1.5s, 3s ...
+    # 모두 실패 → 예외 전파 (자동 환불 트리거)
     raise RuntimeError(f"섹션 '{section_key}' 생성 실패: {last_err}")
+
+
+def _is_rate_limit(e: Exception) -> bool:
+    """OpenAI 429(rate limit) 에러인지 판별"""
+    if e.__class__.__name__ == 'RateLimitError':
+        return True
+    if getattr(e, 'status_code', None) == 429:
+        return True
+    return '429' in str(e) or 'rate_limit' in str(e).lower()
+
+
+def _retry_after_seconds(e: Exception) -> float:
+    """에러 메시지에서 'try again in Xms/Xs' 권장 대기 시간을 추출 (없으면 0)"""
+    msg = str(e)
+    m = re.search(r'try again in ([\d.]+)ms', msg)
+    if m:
+        return float(m.group(1)) / 1000.0 + 0.5  # 여유 0.5s
+    m = re.search(r'try again in ([\d.]+)s', msg)
+    if m:
+        return float(m.group(1)) + 0.5
+    return 0.0
 
 
 # 후킹·스캔성용 박스 마커 → 인라인 스타일 (이메일 클라이언트가 <style>을 무시해도 안전)
