@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>지인 초대 — 라이프코드 해커 무료 체험</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700;900&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+<style>
+  /* ── 지인 페이지 전용 추가 스타일 ── */
+  .invite-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(29, 224, 203, 0.08);
+    border: 1px solid rgba(29, 224, 203, 0.3);
+    border-radius: 999px;
+    padding: 7px 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.12em;
+    color: var(--cyan); margin-bottom: 24px;
+  }
+  .invite-badge::before { content: "✦"; font-size: 10px; }
+
+  /* ── 신청 폼 카드 ── */
+  .form-card {
+    background: linear-gradient(160deg, #0e0e1a, #0c0c14);
+    border: 1px solid rgba(29, 224, 203, 0.2);
+    border-radius: 20px;
+    padding: 30px 24px 28px;
+    margin-top: 32px;
+  }
+  .form-card h2 {
+    font-size: 17px; font-weight: 700;
+    color: var(--paper); margin: 0 0 22px;
+    text-align: center; letter-spacing: -0.01em;
+  }
+  .form-label {
+    display: block; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.2em; color: var(--paper-faint);
+    margin: 18px 0 8px;
+  }
+  .form-input {
+    width: 100%; background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; color: var(--paper);
+    padding: 13px 14px; font-family: var(--font-main);
+    font-size: 15px; outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+  .form-input:focus { border-color: var(--cyan); background: rgba(29,224,203,0.04); }
+  .form-input::placeholder { color: var(--paper-faint); }
+
+  .date-row { display: grid; grid-template-columns: 2fr 1.5fr 1.5fr; gap: 8px; }
+  .date-row .form-input { text-align: center; }
+
+  .toggle-row { display: flex; gap: 8px; margin-top: 0; }
+  .toggle-btn {
+    flex: 1; padding: 12px 8px; border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.03);
+    color: var(--paper-faint); cursor: pointer;
+    font-family: var(--font-main); font-size: 14px;
+    transition: all 0.18s; text-align: center;
+  }
+  .toggle-btn.active {
+    background: rgba(29,224,203,0.1);
+    border-color: var(--cyan-deep); color: var(--cyan);
+    font-weight: 700;
+  }
+
+  .hour-select {
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='7'><path fill='%236C685F' d='M0 0h12L6 7z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+  .hour-select option { background: #0e0e1a; }
+
+  .submit-btn {
+    width: 100%; margin-top: 26px;
+    background: linear-gradient(180deg, var(--cyan-bright), var(--cyan));
+    border: none; border-radius: 14px; cursor: pointer;
+    color: #042a26; padding: 17px 20px;
+    font-family: var(--font-main); font-weight: 700;
+    font-size: 17px; letter-spacing: 0.01em;
+    box-shadow: 0 10px 34px var(--cyan-glow), inset 0 1px 0 rgba(255,255,255,0.4);
+    transition: transform 0.15s, opacity 0.2s;
+  }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .submit-note {
+    text-align: center; font-size: 12px; color: var(--paper-faint);
+    margin-top: 12px; line-height: 1.7;
+  }
+
+  /* ── 에러 ── */
+  .err-msg {
+    color: #f87171; font-size: 13px; text-align: center;
+    margin-top: 10px; min-height: 18px;
+  }
+
+  /* ── 성공 화면 ── */
+  #success-screen { display: none; }
+  .success-icon {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: rgba(29,224,203,0.12);
+    border: 1px solid rgba(29,224,203,0.3);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px; font-size: 32px;
+  }
+  .success-title {
+    font-size: 24px; font-weight: 700; color: var(--paper);
+    text-align: center; margin: 0 0 10px; letter-spacing: -0.02em;
+  }
+  .success-email {
+    text-align: center; font-size: 14px; color: var(--paper-dim);
+    margin: 0 0 28px; line-height: 1.8;
+  }
+  .success-email strong { color: var(--cyan); }
+
+  .review-cta {
+    display: flex; flex-direction: column; align-items: center;
+    background: linear-gradient(160deg, rgba(201,164,92,0.12), rgba(201,164,92,0.03));
+    border: 1px solid var(--gold-line);
+    border-radius: 16px; padding: 22px 20px; margin-top: 10px;
+  }
+  .review-cta p {
+    font-size: 15px; color: var(--paper-dim); text-align: center;
+    margin: 0 0 16px; line-height: 1.7;
+  }
+  .review-cta p strong { color: var(--gold-1); }
+  .review-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, var(--gold-2), var(--gold-3));
+    color: #1a1408; border-radius: 12px;
+    padding: 14px 28px; font-weight: 700; font-size: 15px;
+    text-decoration: none; font-family: var(--font-main);
+    transition: opacity 0.2s;
+  }
+  .review-link:hover { opacity: 0.88; }
+
+  /* ── 보고서 내용 미리보기 (간략) ── */
+  .preview-chips {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px;
+  }
+  .preview-chip {
+    font-size: 12px; color: var(--paper-dim);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 999px; padding: 5px 13px;
+  }
+  .preview-chip.gold { color: var(--gold-2); border-color: var(--gold-line); background: rgba(201,164,92,0.06); }
+  .preview-chip.cyan { color: var(--cyan); border-color: rgba(29,224,203,0.2); background: rgba(29,224,203,0.05); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── 상단 네비 ── -->
+  <nav style="display:flex;justify-content:space-between;align-items:center;padding:16px 26px;border-bottom:1px solid var(--gold-line);">
+    <span style="font-size:13px;font-weight:700;letter-spacing:0.2em;color:var(--gold-2);">라이프코드 해커</span>
+    <a href="/reviews" style="font-size:12px;color:var(--paper-faint);text-decoration:none;">후기 보기</a>
+  </nav>
+
+  <!-- ── 메인 콘텐츠 ── -->
+  <div class="wrap">
+    <section class="sec" style="padding-top:48px;padding-bottom:0">
+      <!-- 초대 배지 -->
+      <div class="invite-badge">지인 특별 초대 · 무료 체험</div>
+
+      <!-- 헤드라인 -->
+      <h1 class="head" style="font-size:clamp(26px,7vw,32px);margin-bottom:14px">
+        <span class="gold">사주로 읽는</span><br>내 무의식 코드,<br>무료로 드립니다.
+      </h1>
+
+      <p class="lead" style="margin-bottom:22px">
+        연애·돈·습관이 왜 반복되는지 — 사주 팔자에 새겨진 무의식의 뿌리를
+        <strong>15개 섹션, 이메일 보고서</strong>로 정리해 드립니다.
+      </p>
+
+      <!-- 포함 내용 칩 -->
+      <div class="preview-chips">
+        <span class="preview-chip gold">✦ 원국 + 오행 에너지 지도</span>
+        <span class="preview-chip">연애 무의식 패턴</span>
+        <span class="preview-chip">재물 무의식 패턴</span>
+        <span class="preview-chip gold">대운 · 세운 분석</span>
+        <span class="preview-chip cyan">2026 월별 캘린더</span>
+        <span class="preview-chip">나만의 정화 선언문</span>
+        <span class="preview-chip">총 15개 섹션</span>
+      </div>
+    </section>
+
+    <!-- ── 폼 ── -->
+    <div id="form-section">
+      <div class="form-card">
+        <h2>생년월일을 알려주세요</h2>
+
+        <label class="form-label">이름 (보고서에 표시)</label>
+        <input class="form-input" id="f-name" type="text" placeholder="홍길동" maxlength="20">
+
+        <label class="form-label">생년월일</label>
+        <div class="date-row">
+          <input class="form-input" id="f-year" type="number" placeholder="년도 (예: 1993)" min="1930" max="2010">
+          <input class="form-input" id="f-month" type="number" placeholder="월" min="1" max="12">
+          <input class="form-input" id="f-day" type="number" placeholder="일" min="1" max="31">
+        </div>
+
+        <label class="form-label">양력 / 음력</label>
+        <div class="toggle-row">
+          <button type="button" class="toggle-btn active" id="btn-solar" onclick="setLunar(false)">☀ 양력</button>
+          <button type="button" class="toggle-btn" id="btn-lunar" onclick="setLunar(true)">🌙 음력</button>
+        </div>
+        <input type="hidden" id="f-lunar" value="false">
+
+        <label class="form-label">출생 시간 (모르면 '모름' 선택)</label>
+        <select class="form-input hour-select" id="f-hour">
+          <option value="-1">모름 (오시로 적용)</option>
+          <option value="23">자시 (子時) 23:30~01:30</option>
+          <option value="1">축시 (丑時) 01:30~03:30</option>
+          <option value="3">인시 (寅時) 03:30~05:30</option>
+          <option value="5">묘시 (卯時) 05:30~07:30</option>
+          <option value="7">진시 (辰時) 07:30~09:30</option>
+          <option value="9">사시 (巳時) 09:30~11:30</option>
+          <option value="11">오시 (午時) 11:30~13:30</option>
+          <option value="13">미시 (未時) 13:30~15:30</option>
+          <option value="15">신시 (申時) 15:30~17:30</option>
+          <option value="17">유시 (酉時) 17:30~19:30</option>
+          <option value="19">술시 (戌時) 19:30~21:30</option>
+          <option value="21">해시 (亥時) 21:30~23:30</option>
+        </select>
+
+        <label class="form-label">성별</label>
+        <div class="toggle-row">
+          <button type="button" class="toggle-btn active" id="btn-male" onclick="setGender('M')">♂ 남성</button>
+          <button type="button" class="toggle-btn" id="btn-female" onclick="setGender('F')">♀ 여성</button>
+        </div>
+        <input type="hidden" id="f-gender" value="M">
+
+        <label class="form-label">이메일 (보고서를 받을 주소)</label>
+        <input class="form-input" id="f-email" type="email" placeholder="example@gmail.com">
+
+        <button class="submit-btn" id="submit-btn" onclick="submitForm()">
+          내 무의식 코드 받기 →
+        </button>
+        <p class="submit-note">5~10분 내 이메일로 발송됩니다 · 스팸함도 확인해 주세요</p>
+        <div class="err-msg" id="err-msg"></div>
+      </div>
+    </div>
+
+    <!-- ── 성공 화면 ── -->
+    <div id="success-screen">
+      <section class="sec" style="padding-top:40px;text-align:center">
+        <div class="success-icon">✉</div>
+        <h2 class="success-title">보고서 만들고 있어요!</h2>
+        <p class="success-email">
+          <strong id="sent-email"></strong><br>
+          으로 5~10분 내 발송됩니다.<br>
+          <span style="font-size:12px;color:var(--paper-faint)">스팸함도 꼭 확인해 주세요.</span>
+        </p>
+
+        <div class="review-cta">
+          <p>
+            보고서를 받아보신 후,<br>
+            <strong>솔직한 후기</strong>를 남겨주시면 정말 힘이 됩니다. 🙏
+          </p>
+          <a class="review-link" href="/reviews#write">
+            ★ 후기 남기러 가기
+          </a>
+        </div>
+
+        <p style="margin-top:30px;font-size:12px;color:var(--paper-faint);line-height:1.8">
+          보고서가 오지 않으면 스팸함을 확인하시거나,<br>
+          스레드 DM으로 알려주시면 바로 확인해 드립니다.
+        </p>
+      </section>
+    </div>
+
+  </div><!-- /wrap -->
+
+  <!-- ── 푸터 ── -->
+  <footer class="footer wrap" style="padding-top:40px">
+    <p class="mark">構造를 읽는 者가 흐름을 支配한다</p>
+    <p class="disc">
+      본 리포트는 의료·심리 치료를 대체하지 않으며 결과를 보장하지 않습니다.
+      마음의 패턴을 정돈하고 변화의 출발점을 제공하는 것을 목적으로 합니다.
+    </p>
+  </footer>
+
+</div><!-- /page -->
+
+<script>
+// ── 토글 헬퍼 ──
+function setLunar(v) {
+  document.getElementById('f-lunar').value = v;
+  document.getElementById('btn-solar').classList.toggle('active', !v);
+  document.getElementById('btn-lunar').classList.toggle('active', v);
+}
+function setGender(v) {
+  document.getElementById('f-gender').value = v;
+  document.getElementById('btn-male').classList.toggle('active', v === 'M');
+  document.getElementById('btn-female').classList.toggle('active', v === 'F');
+}
+
+// ── 폼 제출 ──
+async function submitForm() {
+  const name   = document.getElementById('f-name').value.trim();
+  const year   = document.getElementById('f-year').value.trim();
+  const month  = document.getElementById('f-month').value.trim();
+  const day    = document.getElementById('f-day').value.trim();
+  const hour   = parseInt(document.getElementById('f-hour').value);
+  const gender = document.getElementById('f-gender').value;
+  const lunar  = document.getElementById('f-lunar').value === 'true';
+  const email  = document.getElementById('f-email').value.trim();
+  const errEl  = document.getElementById('err-msg');
+
+  // 간단 유효성 검사
+  if (!name)                    { errEl.textContent = '이름을 입력해 주세요.'; return; }
+  if (!year || !month || !day)  { errEl.textContent = '생년월일을 모두 입력해 주세요.'; return; }
+  if (!email || !email.includes('@')) { errEl.textContent = '올바른 이메일을 입력해 주세요.'; return; }
+  errEl.textContent = '';
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = '생성 중... (약 5~10분 소요)';
+
+  try {
+    const res = await fetch('/api/friend-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name, year: parseInt(year), month: parseInt(month),
+        day: parseInt(day), hour: hour < 0 ? 12 : hour,
+        gender, is_lunar: lunar, email,
+      }),
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      document.getElementById('form-section').style.display = 'none';
+      document.getElementById('success-screen').style.display = 'block';
+      document.getElementById('sent-email').textContent = email;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      errEl.textContent = data.error || '오류가 발생했습니다. 다시 시도해 주세요.';
+      btn.disabled = false;
+      btn.textContent = '내 무의식 코드 받기 →';
+    }
+  } catch (e) {
+    errEl.textContent = '네트워크 오류가 발생했습니다. 다시 시도해 주세요.';
+    btn.disabled = false;
+    btn.textContent = '내 무의식 코드 받기 →';
+  }
+}
+</script>
+</body>
+</html>

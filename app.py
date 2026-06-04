@@ -81,6 +81,13 @@ def reviews_page():
     return render_template('reviews.html', reviews=reviews, avg=avg, count=len(reviews))
 
 
+@app.route('/api/reviews', methods=['GET'])
+def get_reviews():
+    reviews = _load_reviews()
+    reviews = sorted(reviews, key=lambda r: r.get('date', ''), reverse=True)
+    return jsonify(reviews)
+
+
 @app.route('/api/reviews', methods=['POST'])
 def submit_review():
     data = request.get_json(silent=True) or {}
@@ -186,6 +193,27 @@ def confirm_payment():
         'success': True,
         'email': data['email'],
         'message': '결제가 완료되었습니다. 보고서는 5~10분 내 이메일로 발송됩니다.',
+    })
+
+
+@app.route('/friends')
+def friends_page():
+    return render_template('friends.html')
+
+
+@app.route('/api/friend-report', methods=['POST'])
+def friend_report():
+    """지인 전용 무료 보고서 — 코드 불필요, URL이 접근 제어 역할."""
+    data = request.get_json(silent=True) or {}
+    required = ['name', 'email', 'year', 'month', 'day', 'hour', 'gender']
+    for field in required:
+        if field not in data:
+            return jsonify({'error': f'필드 누락: {field}'}), 400
+    _spawn_report(data)
+    return jsonify({
+        'success': True,
+        'email': data['email'],
+        'message': '보고서를 만들고 있어요. 5~10분 내 이메일로 보내드립니다.',
     })
 
 
