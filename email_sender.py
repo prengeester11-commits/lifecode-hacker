@@ -1,30 +1,67 @@
 """
-Gmail SMTP 이메일 발송 모듈
-보고서 HTML과 PDF 첨부를 함께 발송
+이메일 발송 모듈.
+
+Render 무료 플랜은 외부 SMTP 포트(465/587)를 차단하므로, 운영 환경에서는
+Brevo HTTP API(HTTPS 443)로 발송한다. BREVO_API_KEY 가 설정돼 있으면 Brevo를 쓰고,
+없으면 Gmail SMTP로 폴백한다(로컬 개발용).
 """
 import os
 import io
 import base64
 import logging
 import smtplib
+import requests
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 from email.mime.image import MIMEImage
 from email.utils import formataddr
 
+log = logging.getLogger(__name__)
 
 GMAIL_ADDRESS = os.environ.get('GMAIL_ADDRESS', '')
 GMAIL_APP_PASSWORD = os.environ.get('GMAIL_APP_PASSWORD', '')
 SENDER_NAME = '라이프코드 해커'
 
+# Brevo (HTTP 발송) 설정
+BREVO_API_KEY = os.environ.get('BREVO_API_KEY', '')
+# 발신 주소: Brevo에서 '인증된 발신자(verified sender)'여야 함. 기본은 Gmail 주소.
+BREVO_SENDER = os.environ.get('BREVO_SENDER', GMAIL_ADDRESS)
+BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email'
+
+
+def _send_via_brevo(to_email: str, to_name: str, subject: str,
+                    html_content: str, text_content: str = '') -> bool:
+    """Brevo HTTP API로 메일 발송. 실패 시 예외."""
+    payload = {
+        'sender': {'name': SENDER_NAME, 'email': BREVO_SENDER},
+        'to': [{'email': to_email, 'name': to_name or to_email}],
+        'subject': subject,
+        'htmlContent': html_content,
+        'replyTo': {'email': BREVO_SENDER, 'name': SENDER_NAME},
+    }
+    if text_content:
+        payload['textContent'] = text_content
+    resp = requests.post(
+        BREVO_API_URL,
+        headers={'api-key': BREVO_API_KEY, 'content-type': 'application/json',
+                 'accept': 'application/json'},
+        json=payload, timeout=30,
+    )
+    if resp.status_code in (200, 201):
+        log.info(f'Brevo 발송 성공: {to_email} (msgId={resp.json().get("messageId","?")})')
+        return True
+    raise RuntimeError(f'Brevo 발송 실패 status={resp.status_code} body={resp.text[:300]}')
+
 
 def send_notification(subject: str, text: str) -> bool:
-    """관리자(본인)에게 보내는 가벼운 텍스트 알림 메일 (후기 백업 등).
-    실패해도 예외를 던지지 않는다(부가 기능)."""
-    if not GMAIL_ADDRESS or not GMAIL_APP_PASSWORD:
-        return False
+    """관리자(본인)에게 보내는 가벼운 텍스트 알림 메일. 실패해도 예외를 던지지 않는다."""
     try:
+        if BREVO_API_KEY:
+            return _send_via_brevo(GMAIL_ADDRESS, SENDER_NAME, subject,
+                                   f'<pre>{text}</pre>', text)
+        if not GMAIL_ADDRESS or not GMAIL_APP_PASSWORD:
+            return False
         msg = MIMEText(text, 'plain', 'utf-8')
         msg['Subject'] = subject
         msg['From'] = formataddr((SENDER_NAME, GMAIL_ADDRESS))
@@ -36,23 +73,15 @@ def send_notification(subject: str, text: str) -> bool:
     except Exception as e:
         log.warning(f'알림 메일 실패: {e}')
         return False
-log = logging.getLogger(__name__)
 
 
 def html_to_pdf_bytes(html_content: str) -> bytes:
-    """
-    HTML 보고서를 PDF 바이트로 변환
-    우선 WeasyPrint 시도, 실패 시 xhtml2pdf로 fallback
-    둘 다 실패하면 None 반환 (호출자가 PDF 없이 진행하도록)
-    """
-    # 1차: WeasyPrint (CSS3·그라데이션·웹폰트 지원)
+    """HTML 보고서를 PDF 바이트로 변환 (WeasyPrint → xhtml2pdf 폴백). 둘 다 실패 시 None."""
     try:
         from weasyprint import HTML
         return HTML(string=html_content).write_pdf()
     except Exception as e:
         log.warning(f'WeasyPrint PDF 변환 실패, xhtml2pdf로 시도: {e}')
-
-    # 2차: xhtml2pdf (가벼움, CSS 제한)
     try:
         from xhtml2pdf import pisa
         buf = io.BytesIO()
@@ -75,53 +104,51 @@ def send_report_email(
     image_cid: str = 'persona',
 ) -> bool:
     """
-    보고서 HTML을 이메일로 발송 (가능하면 PDF 첨부 + 표지 인라인 이미지 포함)
-    image_bytes: 표지에 삽입할 사주 상징 이미지(JPEG). HTML은 src="cid:persona" 참조.
-    Returns: True(성공) / False(실패)
+    보고서 HTML 이메일 발송.
+    - BREVO_API_KEY 설정 시: Brevo HTTP API (Render 무료에서도 동작). 표지 이미지는 data:URI로 인라인.
+    - 미설정 시: Gmail SMTP (로컬 개발용), CID 인라인 이미지 + 선택적 PDF 첨부.
     """
-    if not GMAIL_ADDRESS or not GMAIL_APP_PASSWORD:
-        raise ValueError('Gmail 계정 정보가 설정되지 않았습니다. .env 파일을 확인하세요.')
+    subject = f'[라이프코드 해커] {to_name}님의 사주 무의식 패턴 보고서가 도착했습니다'
+    text_fallback = (
+        f'{to_name}님의 사주 무의식 패턴 보고서입니다.\n'
+        'HTML을 지원하는 이메일 클라이언트에서 확인해 주세요.'
+    )
 
-    # 멀티파트 mixed: [related(본문+인라인이미지)] + [PDF 첨부]
+    # ── 운영: Brevo HTTP API ──
+    if BREVO_API_KEY:
+        if not BREVO_SENDER:
+            raise ValueError('BREVO_SENDER(발신 주소)가 설정되지 않았습니다.')
+        html_for_api = html_content
+        if image_bytes:
+            data_uri = 'data:image/jpeg;base64,' + base64.b64encode(image_bytes).decode()
+            html_for_api = html_content.replace(f'cid:{image_cid}', data_uri)
+        return _send_via_brevo(to_email, to_name, subject, html_for_api, text_fallback)
+
+    # ── 로컬 개발: Gmail SMTP ──
+    if not GMAIL_ADDRESS or not GMAIL_APP_PASSWORD:
+        raise ValueError('발송 설정이 없습니다. BREVO_API_KEY 또는 Gmail 정보를 설정하세요.')
+
     msg = MIMEMultipart('mixed')
-    msg['Subject'] = f'[라이프코드 해커] {to_name}님의 사주 무의식 패턴 보고서가 도착했습니다'
+    msg['Subject'] = subject
     msg['From'] = formataddr((SENDER_NAME, GMAIL_ADDRESS))
     msg['To'] = formataddr((to_name, to_email))
     msg['Reply-To'] = GMAIL_ADDRESS
 
-    # ── 본문 + 인라인 이미지 (related) ──
     related = MIMEMultipart('related')
     body = MIMEMultipart('alternative')
-    text_part = MIMEText(
-        f'{to_name}님의 사주 무의식 패턴 보고서입니다.\n'
-        '이 이메일은 HTML 형식으로 작성되었습니다. HTML을 지원하는 이메일 클라이언트에서 확인해 주세요.\n'
-        'PDF 첨부 파일도 함께 보내드렸으니 인쇄나 보관용으로 활용하세요.',
-        'plain', 'utf-8'
-    )
-    html_part = MIMEText(html_content, 'html', 'utf-8')
-    body.attach(text_part)
-    body.attach(html_part)
+    body.attach(MIMEText(text_fallback, 'plain', 'utf-8'))
+    body.attach(MIMEText(html_content, 'html', 'utf-8'))
     related.attach(body)
 
-    # 인라인 이미지 (Gmail은 data:URI를 차단하므로 CID 방식 사용)
     if image_bytes:
         img_part = MIMEImage(image_bytes, _subtype='jpeg')
         img_part.add_header('Content-ID', f'<{image_cid}>')
         img_part.add_header('Content-Disposition', 'inline', filename='persona.jpg')
         related.attach(img_part)
-        log.info(f'표지 인라인 이미지 첨부: {len(image_bytes)} bytes')
-
     msg.attach(related)
 
-    # ── PDF 첨부 ──
-    # Render 무료 플랜(512MB)에서는 PDF 변환이 메모리를 크게 먹어 워커가 죽을 수 있다.
-    # 그래서 기본은 PDF 생략(HTML 본문만 발송). 보고서 핵심은 HTML이라 영향 없음.
-    # 메모리 여유가 있는 환경에서 PDF를 원하면 ENABLE_PDF=true 로 켤 수 있다.
     pdf_bytes = None
-    if os.environ.get('ENABLE_PDF', '').lower() != 'true':
-        log.info('PDF 변환 생략(기본값) → HTML 본문만 발송')
-    else:
-        # cid 참조를 data:URI로 치환 (WeasyPrint는 cid를 못 읽음)
+    if os.environ.get('ENABLE_PDF', '').lower() == 'true':
         pdf_source_html = html_content
         if image_bytes:
             data_uri = 'data:image/jpeg;base64,' + base64.b64encode(image_bytes).decode()
@@ -134,9 +161,6 @@ def send_report_email(
         pdf_part = MIMEApplication(pdf_bytes, _subtype='pdf')
         pdf_part.add_header('Content-Disposition', 'attachment', filename=pdf_filename)
         msg.attach(pdf_part)
-        log.info(f'PDF 첨부 완료: {pdf_filename} ({len(pdf_bytes)} bytes)')
-    else:
-        log.warning('PDF 변환 실패 - HTML 이메일만 발송됩니다.')
 
     try:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
@@ -144,9 +168,6 @@ def send_report_email(
             server.sendmail(GMAIL_ADDRESS, to_email, msg.as_string())
         return True
     except smtplib.SMTPAuthenticationError:
-        raise ValueError(
-            'Gmail 인증 실패. Gmail 앱 비밀번호를 확인하세요.\n'
-            '설정 방법: Google 계정 보안 2단계 인증 앱 비밀번호'
-        )
+        raise ValueError('Gmail 인증 실패. 앱 비밀번호를 확인하세요.')
     except Exception as e:
         raise RuntimeError(f'이메일 발송 실패: {str(e)}')
