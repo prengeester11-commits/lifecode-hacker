@@ -247,14 +247,35 @@ def free_report():
     })
 
 
+# 진단용: 마지막 백그라운드 보고서 작업의 단계/예외를 메모리에 기록.
+# Render 런타임 로그 없이도 /api/last-report-status 로 실패 지점을 확인하기 위함.
+import traceback as _traceback
+_LAST_REPORT = {'stage': None, 'error': None, 'traceback': None, 'started': None, 'finished': None, 'email': None}
+
+
+def _report_stage(stage: str, email: str = None):
+    _LAST_REPORT['stage'] = stage
+    if email:
+        _LAST_REPORT['email'] = email
+    app.logger.info(f'[보고서단계] {stage}')
+
+
 def _spawn_report(data: dict, payment_key: str = None, order_id: str = None):
     """보고서 생성·발송을 백그라운드 스레드에서 처리.
     결제 건(payment_key)에서 실패하면 자동 환불한다."""
     def worker():
         with app.app_context():
+            _LAST_REPORT.update({'stage': '시작', 'error': None, 'traceback': None,
+                                 'started': datetime.now().isoformat(), 'finished': None,
+                                 'email': data.get('email')})
             try:
                 _build_and_send_report(data)
+                _LAST_REPORT['stage'] = '완료'
+                _LAST_REPORT['finished'] = datetime.now().isoformat()
             except Exception as e:
+                _LAST_REPORT['error'] = f'{type(e).__name__}: {e}'
+                _LAST_REPORT['traceback'] = _traceback.format_exc()[-1500:]
+                _LAST_REPORT['finished'] = datetime.now().isoformat()
                 app.logger.error(f'백그라운드 보고서 실패(orderId={order_id}): {e}')
                 if payment_key:
                     refund = cancel_payment(payment_key, '보고서 생성 실패에 따른 자동 환불')
@@ -301,11 +322,11 @@ def _build_and_send_report(data: dict):
             astro_context = ''
 
     # ── GPT 보고서 섹션 생성 ──
-    app.logger.info(f'[보고서] 섹션 생성 시작: {data.get("email")}')
+    _report_stage('섹션생성', data.get('email'))
     sections = generate_report_sections(saju_data, astro_context=astro_context)
 
     # ── 사주 상징 이미지 + 표지 헤드라인 (실패해도 보고서는 진행) ──
-    app.logger.info('[보고서] 상징 이미지 생성 시작')
+    _report_stage('이미지생성')
     try:
         persona_image = generate_persona_image(saju_data)
     except Exception as e:
@@ -335,15 +356,15 @@ def _build_and_send_report(data: dict):
         cover_line=cover_line,
     )
 
-    # ── 이메일 발송 ──
-    app.logger.info(f'[보고서] 이메일 발송 시작: {data.get("email")}')
+    # ── HTML 렌더링 완료 → 이메일 발송 ──
+    _report_stage('이메일발송')
     send_report_email(
         to_email=data['email'],
         to_name=data['name'],
         html_content=html_content,
         image_bytes=persona_image,
     )
-    app.logger.info(f'[보고서] 이메일 발송 완료: {data.get("email")}')
+    _report_stage('발송완료')
 
 
 def _refund_and_respond(payment_key: str, order_id: str, error_detail: str):
@@ -731,6 +752,12 @@ def health():
 
 # 배포 검증용: 실제로 어느 코드가 떠 있는지 curl로 확인하기 위한 마커.
 # 값이 바뀌어 보이면 최신 푸시가 정상 배포된 것.
+@app.route('/api/last-report-status')
+def last_report_status():
+    """진단용(임시): 마지막 백그라운드 보고서 작업의 단계/예외 조회. 진단 후 제거 예정."""
+    return jsonify(_LAST_REPORT)
+
+
 @app.route('/version')
 def version():
     return jsonify({
