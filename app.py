@@ -729,6 +729,17 @@ def health():
     return jsonify({'status': 'ok', 'service': 'lifecoder-hacker'})
 
 
+# 배포 검증용: 실제로 어느 코드가 떠 있는지 curl로 확인하기 위한 마커.
+# 값이 바뀌어 보이면 최신 푸시가 정상 배포된 것.
+@app.route('/version')
+def version():
+    return jsonify({
+        'marker': 'v2026-06-05-pdf-off-concurrency2',
+        'pdf_enabled': os.environ.get('ENABLE_PDF', '').lower() == 'true',
+        'free_code_set': bool(FREE_CODE),
+    })
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
