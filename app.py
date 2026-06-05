@@ -209,11 +209,15 @@ def friend_report():
     for field in required:
         if field not in data:
             return jsonify({'error': f'필드 누락: {field}'}), 400
-    _spawn_report(data)
+    token = _secrets.token_urlsafe(8)
+    _REPORTS[token] = {'ready': False, 'error': None, 'name': data.get('name', '')}
+    _spawn_report(data, token=token)
     return jsonify({
         'success': True,
         'email': data['email'],
-        'message': '보고서를 만들고 있어요. 5~10분 내 이메일로 보내드립니다.',
+        'token': token,
+        'report_url': f'/report/{token}',
+        'message': '보고서를 만들고 있어요. 이 화면에서 잠시만 기다리면 바로 보여드려요.',
     })
 
 
@@ -250,7 +254,37 @@ def free_report():
 # 진단용: 마지막 백그라운드 보고서 작업의 단계/예외를 메모리에 기록.
 # Render 런타임 로그 없이도 /api/last-report-status 로 실패 지점을 확인하기 위함.
 import traceback as _traceback
+import secrets as _secrets
 _LAST_REPORT = {'stage': None, 'error': None, 'traceback': None, 'started': None, 'finished': None, 'email': None}
+
+# ── 웹 링크 방식 보고서 저장소 ──
+# Render 무료는 SMTP가 막혀 메일 발송이 안 되므로, 보고서를 웹페이지로 제공한다.
+# 메모리 + 디스크 둘 다 저장(워커 재시작 대비). 디스크는 인스턴스 수명 동안 유지됨.
+_REPORTS = {}  # token -> {'ready': bool, 'error': str|None, 'name': str}
+_REPORT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'report_store')
+os.makedirs(_REPORT_DIR, exist_ok=True)
+
+
+def _report_path(token: str) -> str:
+    safe = ''.join(c for c in token if c.isalnum() or c in '-_')
+    return os.path.join(_REPORT_DIR, f'{safe}.html')
+
+
+def _save_report_html(token: str, html: str, name: str = ''):
+    try:
+        with open(_report_path(token), 'w', encoding='utf-8') as f:
+            f.write(html)
+    except Exception as e:
+        app.logger.warning(f'보고서 디스크 저장 실패(메모리만 사용): {e}')
+    _REPORTS[token] = {'ready': True, 'error': None, 'name': name}
+
+
+def _load_report_html(token: str):
+    try:
+        with open(_report_path(token), encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        return None
 
 
 def _report_stage(stage: str, email: str = None):
@@ -260,22 +294,25 @@ def _report_stage(stage: str, email: str = None):
     app.logger.info(f'[보고서단계] {stage}')
 
 
-def _spawn_report(data: dict, payment_key: str = None, order_id: str = None):
+def _spawn_report(data: dict, payment_key: str = None, order_id: str = None, token: str = None):
     """보고서 생성·발송을 백그라운드 스레드에서 처리.
-    결제 건(payment_key)에서 실패하면 자동 환불한다."""
+    결제 건(payment_key)에서 실패하면 자동 환불한다.
+    token이 있으면 완성된 보고서를 웹 링크(/report/<token>)로 제공한다."""
     def worker():
         with app.app_context():
             _LAST_REPORT.update({'stage': '시작', 'error': None, 'traceback': None,
                                  'started': datetime.now().isoformat(), 'finished': None,
                                  'email': data.get('email')})
             try:
-                _build_and_send_report(data)
+                _build_and_send_report(data, token=token)
                 _LAST_REPORT['stage'] = '완료'
                 _LAST_REPORT['finished'] = datetime.now().isoformat()
             except Exception as e:
                 _LAST_REPORT['error'] = f'{type(e).__name__}: {e}'
                 _LAST_REPORT['traceback'] = _traceback.format_exc()[-1500:]
                 _LAST_REPORT['finished'] = datetime.now().isoformat()
+                if token:
+                    _REPORTS[token] = {'ready': False, 'error': str(e), 'name': data.get('name', '')}
                 app.logger.error(f'백그라운드 보고서 실패(orderId={order_id}): {e}')
                 if payment_key:
                     refund = cancel_payment(payment_key, '보고서 생성 실패에 따른 자동 환불')
@@ -288,9 +325,10 @@ def _spawn_report(data: dict, payment_key: str = None, order_id: str = None):
     threading.Thread(target=worker, daemon=True).start()
 
 
-def _build_and_send_report(data: dict):
-    """만세력 계산 → GPT 해석 → 상징 이미지 → 렌더링 → 이메일 발송.
-    실패 시 예외를 던진다 (결제 흐름에서는 상위에서 자동 환불)."""
+def _build_and_send_report(data: dict, token: str = None):
+    """만세력 계산 → GPT 해석 → 상징 이미지 → 렌더링 → 웹 저장 + 이메일(가능 시).
+    생성 실패 시 예외를 던진다 (결제 흐름에서는 상위에서 자동 환불).
+    이메일 발송 실패는 비치명적(웹 링크가 주 전달 수단)."""
     # ── 만세력 계산 ──
     year   = int(data['year'])
     month  = int(data['month'])
@@ -356,15 +394,31 @@ def _build_and_send_report(data: dict):
         cover_line=cover_line,
     )
 
-    # ── HTML 렌더링 완료 → 이메일 발송 ──
+    # ── 웹 링크 저장 (주 전달 수단) ──
+    # cid 인라인 이미지는 웹에서 안 보이므로 data:URI로 치환해 저장.
+    if token:
+        _report_stage('웹저장')
+        web_html = html_content
+        if persona_image:
+            import base64 as _b64
+            data_uri = 'data:image/jpeg;base64,' + _b64.b64encode(persona_image).decode()
+            web_html = html_content.replace('cid:persona', data_uri)
+        _save_report_html(token, web_html, name=saju_result.name)
+
+    # ── 이메일 발송 (가능 시, 비치명적) ──
     _report_stage('이메일발송')
-    send_report_email(
-        to_email=data['email'],
-        to_name=data['name'],
-        html_content=html_content,
-        image_bytes=persona_image,
-    )
-    _report_stage('발송완료')
+    try:
+        send_report_email(
+            to_email=data['email'],
+            to_name=data['name'],
+            html_content=html_content,
+            image_bytes=persona_image,
+        )
+        _report_stage('발송완료')
+    except Exception as e:
+        # 이메일 실패해도 웹 링크가 있으므로 보고서 전달은 성공으로 본다.
+        app.logger.warning(f'[보고서] 이메일 발송 실패(웹 링크로 대체): {e}')
+        _report_stage('이메일생략(웹링크제공)')
 
 
 def _refund_and_respond(payment_key: str, order_id: str, error_detail: str):
@@ -752,6 +806,32 @@ def health():
 
 # 배포 검증용: 실제로 어느 코드가 떠 있는지 curl로 확인하기 위한 마커.
 # 값이 바뀌어 보이면 최신 푸시가 정상 배포된 것.
+@app.route('/report/<token>')
+def view_report(token):
+    """완성된 보고서를 웹페이지로 제공."""
+    html = _load_report_html(token)
+    if html is None:
+        info = _REPORTS.get(token)
+        if info and info.get('error'):
+            return ('<div style="font-family:sans-serif;max-width:560px;margin:80px auto;'
+                    'text-align:center;color:#333;">보고서 생성 중 문제가 발생했습니다. '
+                    '잠시 후 다시 시도해 주세요.</div>'), 500
+        return ('<div style="font-family:sans-serif;max-width:560px;margin:80px auto;'
+                'text-align:center;color:#333;">아직 보고서를 준비 중이거나 만료된 링크입니다.</div>'), 404
+    return html
+
+
+@app.route('/api/report-ready/<token>')
+def report_ready(token):
+    """폴링용: 보고서 준비 상태 반환."""
+    info = _REPORTS.get(token)
+    if info and info.get('ready'):
+        return jsonify({'ready': True, 'url': f'/report/{token}'})
+    if info and info.get('error'):
+        return jsonify({'ready': False, 'error': True})
+    return jsonify({'ready': False})
+
+
 @app.route('/api/last-report-status')
 def last_report_status():
     """진단용(임시): 마지막 백그라운드 보고서 작업의 단계/예외 조회. 진단 후 제거 예정."""
