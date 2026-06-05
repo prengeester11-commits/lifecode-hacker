@@ -26,7 +26,7 @@ from saju.calculator import calculate_saju, saju_to_dict
 from ai.interpreter import generate_report_sections, generate_cover_line
 from ai.image_gen import generate_persona_image
 from ai.astro import build_astro_context
-from email_sender import send_report_email, send_notification
+from email_sender import send_report_email, send_report_link_email, send_notification
 from refund import cancel_payment, get_payment_key_by_order_id
 
 app = Flask(__name__)
@@ -414,14 +414,25 @@ def _build_and_send_report(data: dict, token: str = None):
         _save_report_html(token, web_html, name=saju_result.name)
 
     # ── 이메일 발송 (가능 시, 비치명적) ──
+    # 신청 후 페이지를 닫아도 받을 수 있도록 '보고서 링크' 메일을 보낸다.
+    # (본문 통째로 넣으면 Gmail이 잘라내므로 링크 방식)
     _report_stage('이메일발송')
     try:
-        send_report_email(
-            to_email=data['email'],
-            to_name=data['name'],
-            html_content=html_content,
-            image_bytes=persona_image,
-        )
+        if token:
+            public_base = os.environ.get('PUBLIC_BASE_URL', 'https://lifecode-hacker1.onrender.com').rstrip('/')
+            send_report_link_email(
+                to_email=data['email'],
+                to_name=data['name'],
+                report_url=f'{public_base}/report/{token}',
+                cover_line=cover_line,
+            )
+        else:
+            send_report_email(
+                to_email=data['email'],
+                to_name=data['name'],
+                html_content=html_content,
+                image_bytes=persona_image,
+            )
         _report_stage('발송완료')
     except Exception as e:
         # 이메일 실패해도 웹 링크가 있으므로 보고서 전달은 성공으로 본다.
