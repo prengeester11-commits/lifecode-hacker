@@ -51,3 +51,5 @@ last_report_preview.html
 reviews.json
 tunnel.log
 *.png
+report_store/
+.buildtest/

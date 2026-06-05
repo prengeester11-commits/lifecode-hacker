@@ -187,12 +187,16 @@ def confirm_payment():
     # '발송 전' 상태이므로 반드시 자동 환불한다. (핵심 안전장치)
     # ─────────────────────────────────────────────
     # 보고서 생성(2~3분)은 백그라운드로. 실패 시 백그라운드에서 자동 환불.
-    _spawn_report(data, payment_key=payment_key, order_id=order_id)
+    token = _secrets.token_urlsafe(8)
+    _REPORTS[token] = {'ready': False, 'error': None, 'name': data.get('name', '')}
+    _spawn_report(data, payment_key=payment_key, order_id=order_id, token=token)
 
     return jsonify({
         'success': True,
         'email': data['email'],
-        'message': '결제가 완료되었습니다. 보고서는 5~10분 내 이메일로 발송됩니다.',
+        'token': token,
+        'report_url': f'/report/{token}',
+        'message': '결제가 완료되었습니다. 보고서를 만들고 있어요.',
     })
 
 
@@ -241,13 +245,17 @@ def free_report():
         if field not in data:
             return jsonify({'error': f'필드 누락: {field}'}), 400
 
-    # 백그라운드 생성 → 즉시 응답 (클라우드 타임아웃 방지)
-    _spawn_report(data)
+    # 토큰 발급 후 백그라운드 생성 → 즉시 응답 (웹 링크로 제공)
+    token = _secrets.token_urlsafe(8)
+    _REPORTS[token] = {'ready': False, 'error': None, 'name': data.get('name', '')}
+    _spawn_report(data, token=token)
 
     return jsonify({
         'success': True,
         'email': data['email'],
-        'message': '체험 보고서를 만들고 있어요. 5~10분 내 이메일로 보내드립니다.',
+        'token': token,
+        'report_url': f'/report/{token}',
+        'message': '체험 보고서를 만들고 있어요. 이 화면에서 잠시만 기다리면 바로 보여드려요.',
     })
 
 
@@ -830,21 +838,6 @@ def report_ready(token):
     if info and info.get('error'):
         return jsonify({'ready': False, 'error': True})
     return jsonify({'ready': False})
-
-
-@app.route('/api/last-report-status')
-def last_report_status():
-    """진단용(임시): 마지막 백그라운드 보고서 작업의 단계/예외 조회. 진단 후 제거 예정."""
-    return jsonify(_LAST_REPORT)
-
-
-@app.route('/version')
-def version():
-    return jsonify({
-        'marker': 'v2026-06-05-pdf-off-concurrency2',
-        'pdf_enabled': os.environ.get('ENABLE_PDF', '').lower() == 'true',
-        'free_code_set': bool(FREE_CODE),
-    })
 
 
 if __name__ == '__main__':

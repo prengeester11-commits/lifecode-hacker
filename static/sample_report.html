@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>홍길동님의 사주 무의식 패턴 보고서 — 라이프코드 해커</title>
+<!-- 프리미엄 웹폰트: Pretendard(본문) + Nanum Myeongjo(표지·제목 명조체) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ── 리셋 ── */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0b0b14;
+    color: #dcdce8;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
+                 'Noto Sans KR', sans-serif;
+    font-size: 14.5px;
+    line-height: 1.82;
+    letter-spacing: -0.2px;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* 명조체(serif) 헤딩 — 표지·섹션 제목용 */
+  .serif {
+    font-family: 'Nanum Myeongjo', 'Apple SD Gothic Neo', 'Pretendard', serif;
+  }
+  a { color: #a78bfa; text-decoration: none; }
+
+  /* ── 레이아웃 ── */
+  .wrapper {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 0 40px;
+  }
+
+  /* ── 헤더 ── */
+  .header {
+    background: linear-gradient(135deg, #1a0533 0%, #0d0d2b 50%, #001233 100%);
+    padding: 48px 28px 36px;
+    text-align: center;
+    border-bottom: 1px solid rgba(167,139,250,0.25);
+  }
+  .brand {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #a78bfa;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  .header-title {
+    font-family: 'Nanum Myeongjo', 'Apple SD Gothic Neo', 'Pretendard', serif;
+    font-size: 25px;
+    font-weight: 800;
+    line-height: 1.45;
+    color: #f0ecff;
+    margin-bottom: 8px;
+    letter-spacing: -0.4px;
+  }
+  .header-title span {
+    background: linear-gradient(90deg, #a78bfa, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: #8b8baa;
+    margin-top: 12px;
+  }
+
+  /* ── 서문 (선물 같은 헌사) ── */
+  .preface {
+    text-align: center;
+    padding: 40px 30px 36px;
+  }
+  .preface-rule {
+    width: 44px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e7c66b, transparent);
+    margin: 0 auto;
+  }
+  .preface-mark {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 20px;
+    color: #e7c66b;
+    margin: 18px 0;
+    letter-spacing: 2px;
+  }
+  .preface-text {
+    font-size: 14px;
+    line-height: 2.0;
+    color: #cfc8ea;
+    word-break: keep-all;
+    margin: 18px 0;
+  }
+
+  /* ── 원국 카드 ── */
+  .saju-card {
+    margin: 28px 20px;
+    background: linear-gradient(145deg, #12102a, #0e1428);
+    border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 20px;
+    padding: 24px 20px;
+  }
+  .saju-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #a78bfa;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pillar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .pillar {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(167,139,250,0.15);
+    border-radius: 14px;
+    padding: 14px 8px;
+    text-align: center;
+  }
+  .pillar-label {
+    font-size: 10px;
+    color: #6b6b8a;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+  .pillar-hanja {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    margin: 6px 0 4px;
+  }
+  .pillar-stem, .pillar-branch {
+    display: block;
+    text-shadow: 0 0 12px currentColor;
+  }
+  .pillar-kor {
+    font-size: 11px;
+    color: #8878cc;
+    margin-top: 6px;
+  }
+
+  /* 오행별 글자 색상 (한자 직접 컬러링) */
+  .char-mok  { color: #4ade80; }   /* 木 — 청록 */
+  .char-hwa  { color: #f87171; }   /* 火 — 빨강 */
+  .char-to   { color: #fbbf24; }   /* 土 — 황색 */
+  .char-geum { color: #e5e7eb; }   /* 金 — 백색 */
+  .char-su   { color: #60a5fa; }   /* 水 — 청색 */
+
+  /* 오행 분포 바용 글자색 */
+  .oh-mok  { color: #4ade80; }
+  .oh-hwa  { color: #f87171; }
+  .oh-to   { color: #fbbf24; }
+  .oh-geum { color: #e5e7eb; }
+  .oh-su   { color: #60a5fa; }
+
+  .ilgan-badge {
+    margin-top: 16px;
+    padding: 10px 16px;
+    background: rgba(167,139,250,0.1);
+    border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 10px;
+    font-size: 13px;
+    color: #c4b5fd;
+    text-align: center;
+  }
+
+  /* ── 분석 근거 배지 (계산 투명성 → 신뢰) ── */
+  .evidence-box {
+    margin-top: 14px;
+    padding: 14px 16px 12px;
+    background: rgba(231,198,107,0.06);
+    border: 1px solid rgba(231,198,107,0.22);
+    border-radius: 12px;
+  }
+  .evidence-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    color: #e7c66b;
+    margin-bottom: 9px;
+  }
+  .evidence-box table { border-collapse: collapse; }
+  .ev-k {
+    font-size: 12px;
+    color: #9a93b8;
+    padding: 4px 10px 4px 0;
+    white-space: nowrap;
+    vertical-align: top;
+    width: 84px;
+  }
+  .ev-v {
+    font-size: 12.5px;
+    color: #dcdce8;
+    font-weight: 600;
+    padding: 4px 0;
+    line-height: 1.5;
+  }
+  .ev-v .ev-sub {
+    color: #7d789c;
+    font-weight: 400;
+    font-size: 11px;
+  }
+  .ev-help { color: #ecc65f; }
+  .evidence-foot {
+    margin-top: 9px;
+    font-size: 10.5px;
+    color: #6f6a8e;
+    text-align: center;
+  }
+
+  /* ── 오행 바 ── */
+  .ohaeng-section {
+    margin: 0 20px 28px;
+    background: linear-gradient(145deg, #12102a, #0e1428);
+    border: 1px solid rgba(167,139,250,0.15);
+    border-radius: 20px;
+    padding: 24px 20px;
+  }
+  .ohaeng-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 10px;
+  }
+  .ohaeng-label {
+    width: 28px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .ohaeng-bar-wrap {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border-radius: 99px;
+    height: 8px;
+    overflow: hidden;
+  }
+  .ohaeng-bar {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.8s ease;
+  }
+  .bar-mok  { background: linear-gradient(90deg, #4caf50, #81c784); }
+  .bar-hwa  { background: linear-gradient(90deg, #ff5722, #ff8a65); }
+  .bar-to   { background: linear-gradient(90deg, #ffc107, #ffd54f); }
+  .bar-geum { background: linear-gradient(90deg, #9e9e9e, #bdbdbd); }
+  .bar-su   { background: linear-gradient(90deg, #2196f3, #64b5f6); }
+  .ohaeng-pct {
+    width: 36px;
+    font-size: 12px;
+    color: #8888aa;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── 섹션 카드 ── */
+  .section {
+    margin: 0 20px 24px;
+    background: linear-gradient(145deg, #0f0f24, #0d1220);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .section-header {
+    padding: 20px 22px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.02);
+  }
+  .section-emoji {
+    font-size: 20px;
+    margin-right: 8px;
+  }
+  .section-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: #f0ecff;
+    display: inline;
+    letter-spacing: -0.4px;
+  }
+  .section-body {
+    padding: 22px 22px;
+    font-size: 14.5px;
+    line-height: 1.9;
+    color: #cdcde0;
+  }
+  .section-body h3, .section-body strong {
+    color: #e8e0ff;
+    font-weight: 700;
+  }
+  .section-body p {
+    margin-bottom: 12px;
+  }
+
+  /* ── 핵심 한 줄 요약 박스 (스캔성: 섹션마다 맨 위 한눈에) ── */
+  .key-box {
+    margin: 0 0 16px;
+    padding: 13px 15px 13px 16px;
+    background: linear-gradient(135deg, rgba(167,139,250,0.16), rgba(96,165,250,0.10));
+    border-left: 3px solid #a78bfa;
+    border-radius: 0 12px 12px 0;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #f0ecff;
+    line-height: 1.6;
+  }
+  .key-box .key-label {
+    display: block;
+    font-size: 10.5px;
+    letter-spacing: 1.5px;
+    color: #a78bfa;
+    font-weight: 800;
+    margin-bottom: 5px;
+  }
+
+  /* ── 흥미 포인트 박스 ("와 이거 재밌네" 후킹) ── */
+  .fun-box {
+    position: relative;
+    margin: 20px 0;
+    padding: 18px 17px 16px;
+    background: linear-gradient(135deg, rgba(251,191,36,0.16), rgba(244,114,182,0.10));
+    border: 1px solid rgba(251,191,36,0.38);
+    border-radius: 16px;
+    font-size: 14px;
+    color: #f6ecd6;
+    line-height: 1.78;
+  }
+  .fun-box .fun-label {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: #1a1206;
+    background: linear-gradient(135deg, #fcd34d, #fbbf24);
+    font-weight: 800;
+    padding: 3px 11px;
+    border-radius: 20px;
+    margin-bottom: 9px;
+  }
+
+  /* ── 희망/대면상담 은근한 유도 박스 ── */
+  .hope-box {
+    margin: 16px 0 4px;
+    padding: 15px 17px;
+    background: linear-gradient(135deg, rgba(196,181,253,0.10), rgba(110,231,183,0.06));
+    border: 1px solid rgba(196,181,253,0.22);
+    border-radius: 14px;
+    font-size: 13.6px;
+    color: #d9d4f0;
+    line-height: 1.75;
+    font-style: normal;
+  }
+  .hope-box .hope-label {
+    display: inline-block;
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    color: #c4b5fd;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  /* ── 의미 기반 인라인 하이라이트 (3색 체계, 정밀하게) ── */
+  /* 핵심: 꼭 기억할 키워드(골드) */
+  .hl {
+    color: #ecc65f;
+    font-weight: 700;
+  }
+  /* 기회·강점·긍정 신호(민트) */
+  .hl-up {
+    color: #5fd6a6;
+    font-weight: 700;
+  }
+  /* 균형·속도조절·돌봄이 필요한 지점(살구, 공포 아님) */
+  .hl-care {
+    color: #f0a98a;
+    font-weight: 700;
+  }
+
+  /* 섹션 색상 테마 */
+  .section-intro .section-header { border-top: 3px solid #a78bfa; }
+  .section-love .section-header { border-top: 3px solid #f472b6; }
+  .section-money .section-header { border-top: 3px solid #fbbf24; }
+  .section-habit .section-header { border-top: 3px solid #34d399; }
+  .section-hapchung .section-header { border-top: 3px solid #f87171; }
+  .section-daewoon .section-header { border-top: 3px solid #60a5fa; }
+  .section-sewoon .section-header { border-top: 3px solid #a78bfa; }
+  .section-action .section-header { border-top: 3px solid #4ade80; }
+  .section-purification .section-header { border-top: 3px solid #c4b5fd; }
+
+  /* ── 대운 타임라인 ── */
+  .daewoon-list {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0 8px;
+    scrollbar-width: none;
+  }
+  .daewoon-list::-webkit-scrollbar { display: none; }
+  .daewoon-item {
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 10px 14px;
+    text-align: center;
+    min-width: 72px;
+  }
+  .daewoon-item.current {
+    background: rgba(167,139,250,0.15);
+    border-color: rgba(167,139,250,0.5);
+  }
+  .daewoon-age {
+    font-size: 10px;
+    color: #6b6b8a;
+    margin-bottom: 4px;
+  }
+  .daewoon-item.current .daewoon-age { color: #a78bfa; }
+  .daewoon-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: #e0d7ff;
+  }
+  .daewoon-item.current .daewoon-name { color: #c4b5fd; }
+  .current-badge {
+    font-size: 9px;
+    color: #a78bfa;
+    margin-top: 4px;
+    font-weight: 600;
+  }
+
+  /* ── 정화 선언문 ── */
+  .purification-box {
+    background: linear-gradient(165deg, #160a30, #0a1138);
+    border: 1px solid rgba(196,181,253,0.28);
+    border-radius: 18px;
+    padding: 30px 24px 26px;
+    margin: 16px 0 0;
+    font-family: 'Nanum Myeongjo', 'Apple SD Gothic Neo', 'Pretendard', serif;
+    font-size: 14.5px;
+    line-height: 2.15;
+    color: #e4def7;
+    text-align: center;
+    font-weight: 400;
+    letter-spacing: -0.2px;
+  }
+  .purification-box p { margin: 0 0 14px; }
+  .purification-box strong { color: #e4def7; font-weight: 700; }
+  .purification-share {
+    margin: 14px 20px 0;
+    text-align: center;
+    font-size: 11.5px;
+    color: #8b86b8;
+    letter-spacing: 0.3px;
+    word-break: keep-all;
+  }
+
+  /* ── 액션 리스트 ── */
+  .action-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+  .action-num {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    margin-top: 2px;
+  }
+  .num-do { background: rgba(74,222,128,0.2); color: #4ade80; }
+  .num-dont { background: rgba(248,113,113,0.2); color: #f87171; }
+  .num-watch { background: rgba(167,139,250,0.2); color: #a78bfa; }
+
+  /* ── 푸터 ── */
+  .footer {
+    margin: 40px 20px 0;
+    padding: 28px 20px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+    color: #4a4a6a;
+    font-size: 12px;
+    line-height: 1.9;
+  }
+  .footer-brand {
+    font-size: 14px;
+    font-weight: 700;
+    color: #6b5aad;
+    margin-bottom: 8px;
+  }
+
+  /* ── 마크다운 스타일 처리 ── */
+  .section-body h2 {
+    font-size: 16px;
+    font-weight: 800;
+    color: #e8e0ff;
+    margin: 18px 0 10px;
+    display: none; /* 섹션 헤더가 이미 있으므로 숨김 */
+  }
+  .section-body h3, .section-body h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #c4b5fd;
+    margin: 16px 0 8px;
+  }
+  .section-body ul, .section-body ol {
+    padding-left: 18px;
+    margin-bottom: 12px;
+  }
+  .section-body li {
+    margin-bottom: 6px;
+    color: #c8c8e0;
+  }
+  .section-body strong {
+    color: #e8e0ff;
+  }
+  .section-body em {
+    color: #a78bfa;
+    font-style: normal;
+  }
+
+  /* ── 신규 섹션 색상 테마 ── */
+  .section-gyeokguk .section-header { border-top: 3px solid #c084fc; }
+  .section-career .section-header   { border-top: 3px solid #5eead4; }
+  .section-family .section-header   { border-top: 3px solid #fda4af; }
+  .section-calendar .section-header { border-top: 3px solid #fdba74; }
+
+  /* ── 표지 페이지 (Gmail 모바일 호환 — table 기반) ── */
+  .cover-table {
+    width: 100%;
+    background-color: #0a0420;
+    background-image: linear-gradient(180deg, #06061a 0%, #0f0a2a 50%, #1a0533 100%);
+    border-bottom: 1px solid rgba(167,139,250,0.2);
+  }
+  .cover-inner { padding: 56px 24px 48px; text-align: center; }
+  .cover-brand {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: #a78bfa;
+    margin: 0 0 28px;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .cover-title {
+    font-family: 'Nanum Myeongjo', 'Apple SD Gothic Neo', 'Pretendard', serif;
+    font-size: 27px;
+    font-weight: 800;
+    color: #f3eeff;
+    line-height: 1.5;
+    margin: 0 0 10px;
+    text-align: center;
+    word-break: keep-all;
+    letter-spacing: -0.5px;
+  }
+  .cover-subtitle {
+    font-size: 13px;
+    color: #9ca3d0;
+    margin: 0 0 36px;
+    letter-spacing: 1px;
+    text-align: center;
+    word-break: keep-all;
+  }
+  .cover-meta {
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+    background-color: rgba(167,139,250,0.08);
+    border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 14px;
+    border-collapse: separate;
+  }
+  .cover-meta td {
+    padding: 11px 18px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(167,139,250,0.08);
+    word-break: keep-all;
+  }
+  .cover-meta tr:last-child td { border-bottom: none; }
+  .cover-meta-key {
+    color: #8b86b8;
+    text-align: left;
+    white-space: nowrap;
+    width: 35%;
+  }
+  .cover-meta-val {
+    color: #e8e3ff;
+    font-weight: 700;
+    text-align: right;
+    word-break: keep-all;
+  }
+  .cover-serial-box {
+    margin-top: 20px;
+    text-align: center;
+  }
+  .cover-serial {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #6b6790;
+    font-family: 'Courier New', monospace;
+    padding: 6px 14px;
+    border: 1px solid rgba(167,139,250,0.15);
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  /* ── 12개월 캘린더 ── */
+  .month-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 14px 0;
+  }
+  .month-cell {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(253,186,116,0.18);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .month-num {
+    font-size: 11px;
+    color: #fdba74;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .month-text {
+    font-size: 12px;
+    color: #d4d4e0;
+    line-height: 1.6;
+  }
+
+  /* ── 반응형 (모바일 가독성 강화) ── */
+  @media (max-width: 480px) {
+    body { font-size: 15px; }
+    .wrapper { padding: 0 0 32px; }
+
+    /* 표지 */
+    .cover-inner { padding: 44px 18px 36px !important; }
+    .cover-title { font-size: 22px !important; line-height: 1.4 !important; }
+    .cover-subtitle { font-size: 12px !important; margin-bottom: 28px !important; }
+    .cover-meta td { padding: 9px 14px !important; font-size: 12px !important; }
+
+    /* 헤더 */
+    .header { padding: 36px 20px 28px; }
+    .header-title { font-size: 22px; line-height: 1.4; word-break: keep-all; }
+    .header-sub { font-size: 12px; line-height: 1.7; }
+
+    /* 사주 카드 */
+    .saju-card { margin: 20px 12px; padding: 20px 14px; }
+    .saju-card-title { font-size: 12px; }
+    .ilgan-badge { font-size: 12px; padding: 10px 12px; word-break: keep-all; }
+
+    /* 오행 */
+    .ohaeng-section { margin: 0 12px 22px; padding: 20px 16px; }
+
+    /* 섹션 */
+    .section { margin: 0 12px 20px; }
+    .section-header { padding: 16px 18px 14px; }
+    .section-title { font-size: 16px; word-break: keep-all; }
+    .section-body { padding: 19px; font-size: 14.3px; line-height: 1.88; }
+
+    /* 대운/세운 */
+    .daewoon-item { min-width: 64px; padding: 9px 11px; }
+    .daewoon-name { font-size: 14px; }
+
+    /* 12개월 */
+    .month-grid { grid-template-columns: 1fr; }
+
+    /* 푸터 */
+    .footer { margin: 28px 16px 0; padding: 22px 16px; }
+  }
+
+  @media (max-width: 360px) {
+    .cover-title { font-size: 20px !important; }
+    .header-title { font-size: 20px; }
+    .section-title { font-size: 14px; }
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background:#0b0b14;">
+
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0b0b14;margin:0;">
+<tr><td align="center" style="padding:0;">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:#0b0b14;">
+<tr><td style="padding:0 0 36px;">
+
+  <!-- ── 표지 페이지 (table-based, Gmail 모바일 호환) ── -->
+  <table class="cover-table" role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+         style="background-color:#0a0420;">
+    <tr>
+      <td class="cover-inner" align="center" style="padding:56px 24px 48px;text-align:center;">
+
+        <div class="cover-brand" style="font-size:11px;letter-spacing:4px;color:#a78bfa;font-weight:700;margin:0 0 28px;">
+          LIFECODE HACKER
+        </div>
+
+        <h1 class="cover-title"
+            style="font-size:26px;font-weight:900;color:#f3eeff;line-height:1.45;margin:0 0 10px;word-break:keep-all;">
+          홍길동님의<br>인생 무의식 패턴 보고서
+        </h1>
+
+        
+        <div class="cover-essence serif"
+             style="font-size:18px;font-weight:700;color:#e7c66b;line-height:1.55;margin:18px auto 8px;max-width:300px;word-break:keep-all;">
+          금빛 가시, 은은한 강함을 지니다.
+        </div>
+        
+
+        <p class="cover-subtitle"
+           style="font-size:13px;color:#9ca3d0;letter-spacing:1px;margin:0 0 32px;word-break:keep-all;">
+          사주명리와 무의식 정화 통합 분석
+        </p>
+
+        
+        <!-- ── 사주 상징 이미지 (그 사람의 기운을 담은 한 장) ── -->
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 32px;">
+          <tr><td align="center" style="text-align:center;">
+            <img src="data:image/jpeg;base64,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" width="262" alt="당신의 사주 상징 이미지"
+                 style="width:262px;max-width:74%;height:auto;border-radius:18px;
+                        border:1px solid rgba(231,198,107,0.45);display:block;margin:0 auto;">
+            <div class="serif" style="font-size:12px;color:#a99fce;margin-top:13px;letter-spacing:0.5px;word-break:keep-all;">
+              경(금)의 기운을 담은 당신의 상징
+            </div>
+          </td></tr>
+        </table>
+        
+
+        <table class="cover-meta" role="presentation" cellpadding="0" cellspacing="0" border="0"
+               style="width:100%;max-width:440px;margin:0 auto;background-color:rgba(167,139,250,0.08);
+                      border:1px solid rgba(167,139,250,0.2);border-radius:14px;">
+          <tr>
+            <td class="cover-meta-key" style="padding:11px 18px;font-size:13px;color:#8b86b8;text-align:left;white-space:nowrap;width:35%;border-bottom:1px solid rgba(167,139,250,0.08);">의뢰인</td>
+            <td class="cover-meta-val" style="padding:11px 18px;font-size:13px;color:#e8e3ff;font-weight:700;text-align:right;word-break:keep-all;border-bottom:1px solid rgba(167,139,250,0.08);">홍길동</td>
+          </tr>
+          <tr>
+            <td class="cover-meta-key" style="padding:11px 18px;font-size:13px;color:#8b86b8;text-align:left;white-space:nowrap;border-bottom:1px solid rgba(167,139,250,0.08);">생년월일</td>
+            <td class="cover-meta-val" style="padding:11px 18px;font-size:13px;color:#e8e3ff;font-weight:700;text-align:right;word-break:keep-all;border-bottom:1px solid rgba(167,139,250,0.08);">1990년 5월 15일</td>
+          </tr>
+          <tr>
+            <td class="cover-meta-key" style="padding:11px 18px;font-size:13px;color:#8b86b8;text-align:left;white-space:nowrap;border-bottom:1px solid rgba(167,139,250,0.08);">출생시간</td>
+            <td class="cover-meta-val" style="padding:11px 18px;font-size:13px;color:#e8e3ff;font-weight:700;text-align:right;word-break:keep-all;border-bottom:1px solid rgba(167,139,250,0.08);">14:00 (미시)</td>
+          </tr>
+          <tr>
+            <td class="cover-meta-key" style="padding:11px 18px;font-size:13px;color:#8b86b8;text-align:left;white-space:nowrap;border-bottom:1px solid rgba(167,139,250,0.08);">성별</td>
+            <td class="cover-meta-val" style="padding:11px 18px;font-size:13px;color:#e8e3ff;font-weight:700;text-align:right;word-break:keep-all;border-bottom:1px solid rgba(167,139,250,0.08);">남성</td>
+          </tr>
+          <tr>
+            <td class="cover-meta-key" style="padding:11px 18px;font-size:13px;color:#8b86b8;text-align:left;white-space:nowrap;">발행일</td>
+            <td class="cover-meta-val" style="padding:11px 18px;font-size:13px;color:#e8e3ff;font-weight:700;text-align:right;word-break:keep-all;">2026년 06월 04일</td>
+          </tr>
+        </table>
+
+        <div class="cover-serial-box" style="margin-top:20px;text-align:center;">
+          <span class="cover-serial"
+                style="display:inline-block;font-size:10px;letter-spacing:2px;color:#6b6790;
+                       font-family:'Courier New',monospace;padding:6px 14px;
+                       border:1px solid rgba(167,139,250,0.15);border-radius:6px;white-space:nowrap;">
+            REPORT NO. LH-SAMPLE-0000
+          </span>
+        </div>
+
+      </td>
+    </tr>
+  </table>
+
+  <!-- ── 서문 (선물 같은 헌사) ── -->
+  <div style="text-align:center;padding:38px 30px 34px;">
+    <div style="width:44px;height:1px;background:#e7c66b;margin:0 auto 20px;font-size:0;line-height:0;">&nbsp;</div>
+    <div style="font-family:'Nanum Myeongjo','Apple SD Gothic Neo',serif;font-size:14.5px;line-height:2.0;color:#cfc8ea;word-break:keep-all;">
+      이 보고서는 홍길동님 단 한 분을 위해<br>
+      사주명리와 무의식 정화의 언어로 정성껏 쓰였습니다.<br>
+      서두르지 말고, 마음이 머무는 문장에 잠시 머물러 주세요.<br>
+      여기 적힌 모든 것은 당신을 탓하기 위함이 아니라,<br>
+      더 자유로워지기 위한 지도입니다.
+    </div>
+    <div style="width:44px;height:1px;background:#e7c66b;margin:20px auto 0;font-size:0;line-height:0;">&nbsp;</div>
+  </div>
+
+  <!-- ── 사주팔자 원국 (시주→일주→월주→년주) ── -->
+  <div style="margin:24px 14px;background:#11111f;border:1px solid #222231;border-radius:18px;padding:22px 16px;">
+    <div style="font-size:12px;font-weight:800;letter-spacing:0.5px;color:#a78bfa;margin-bottom:14px;">내 사주 원국</div>
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:separate;border-spacing:6px 0;">
+      <tr>
+        
+        
+        <td width="25%" align="center" valign="top"
+            style="background-color:#1a1a28;border:1px solid #2c2c40;border-radius:14px;padding:14px 4px;">
+          <div style="font-size:10px;color:#6b6b8a;font-weight:600;letter-spacing:1px;margin-bottom:8px;">시주</div>
+          <div style="font-size:24px;font-weight:900;line-height:1.2;">
+            <div style="color:#60a5fa;">癸</div>
+            <div style="color:#fbbf24;margin-top:2px;">未</div>
+          </div>
+          <div style="font-size:11px;color:#8878cc;margin-top:8px;word-break:keep-all;">계미</div>
+        </td>
+        
+        
+        <td width="25%" align="center" valign="top"
+            style="background-color:#1a1a28;border:1px solid #2c2c40;border-radius:14px;padding:14px 4px;">
+          <div style="font-size:10px;color:#6b6b8a;font-weight:600;letter-spacing:1px;margin-bottom:8px;">일주</div>
+          <div style="font-size:24px;font-weight:900;line-height:1.2;">
+            <div style="color:#e5e7eb;">庚</div>
+            <div style="color:#fbbf24;margin-top:2px;">辰</div>
+          </div>
+          <div style="font-size:11px;color:#8878cc;margin-top:8px;word-break:keep-all;">경진</div>
+        </td>
+        
+        
+        <td width="25%" align="center" valign="top"
+            style="background-color:#1a1a28;border:1px solid #2c2c40;border-radius:14px;padding:14px 4px;">
+          <div style="font-size:10px;color:#6b6b8a;font-weight:600;letter-spacing:1px;margin-bottom:8px;">월주</div>
+          <div style="font-size:24px;font-weight:900;line-height:1.2;">
+            <div style="color:#e5e7eb;">辛</div>
+            <div style="color:#f87171;margin-top:2px;">巳</div>
+          </div>
+          <div style="font-size:11px;color:#8878cc;margin-top:8px;word-break:keep-all;">신사</div>
+        </td>
+        
+        
+        <td width="25%" align="center" valign="top"
+            style="background-color:#1a1a28;border:1px solid #2c2c40;border-radius:14px;padding:14px 4px;">
+          <div style="font-size:10px;color:#6b6b8a;font-weight:600;letter-spacing:1px;margin-bottom:8px;">년주</div>
+          <div style="font-size:24px;font-weight:900;line-height:1.2;">
+            <div style="color:#e5e7eb;">庚</div>
+            <div style="color:#f87171;margin-top:2px;">午</div>
+          </div>
+          <div style="font-size:11px;color:#8878cc;margin-top:8px;word-break:keep-all;">경오</div>
+        </td>
+        
+      </tr>
+    </table>
+
+    <div style="margin-top:16px;padding:10px 14px;background:#1c1733;border:1px solid #322a5a;border-radius:10px;font-size:13px;color:#c4b5fd;text-align:center;word-break:keep-all;">
+      일간(日干, 나의 에너지) <strong style="color:#e8e0ff;">경(금)</strong> 신약(身弱)
+    </div>
+
+    
+    <div style="margin-top:14px;padding:14px 16px 12px;background:#211c0f;border:1px solid #5a4d22;border-radius:12px;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:0.4px;color:#e7c66b;margin-bottom:10px;">분석 근거 · 정통 만세력 계산</div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="font-size:12px;color:#9a93b8;padding:4px 10px 4px 0;white-space:nowrap;vertical-align:top;width:88px;">강약 판정</td>
+          <td style="font-size:12.5px;color:#dcdce8;font-weight:600;padding:4px 0;line-height:1.5;">신약(身弱) <span style="color:#7d789c;font-weight:400;font-size:11px;">종합 5점</span></td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:#9a93b8;padding:4px 10px 4px 0;white-space:nowrap;vertical-align:top;">월령(月令)</td>
+          <td style="font-size:12.5px;color:#dcdce8;font-weight:600;padding:4px 0;line-height:1.5;">실령 <span style="color:#7d789c;font-weight:400;font-size:11px;">태어난 달이 나를 받쳐주지 않습니다</span></td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:#9a93b8;padding:4px 10px 4px 0;white-space:nowrap;vertical-align:top;">득지(得地)</td>
+          <td style="font-size:12.5px;color:#dcdce8;font-weight:600;padding:4px 0;line-height:1.5;">성공 <span style="color:#7d789c;font-weight:400;font-size:11px;">일지(배우자 자리)의 지원</span></td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:#9a93b8;padding:4px 10px 4px 0;white-space:nowrap;vertical-align:top;">득세(得勢)</td>
+          <td style="font-size:12.5px;color:#dcdce8;font-weight:600;padding:4px 0;line-height:1.5;">3점 <span style="color:#7d789c;font-weight:400;font-size:11px;">주변 글자들의 지원</span></td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:#9a93b8;padding:4px 10px 4px 0;white-space:nowrap;vertical-align:top;">나를 돕는 기운</td>
+          <td style="font-size:12.5px;color:#ecc65f;font-weight:700;padding:4px 0;">금 · 토</td>
+        </tr>
+      </table>
+      <div style="margin-top:9px;font-size:10.5px;color:#6f6a8e;text-align:center;">이 보고서의 모든 해석은 위 계산을 근거로 합니다.</div>
+    </div>
+  </div>
+
+  <!-- ── 오행 분포 ── -->
+  <div style="margin:0 14px 24px;background:#11111f;border:1px solid #222231;border-radius:18px;padding:20px 16px;">
+    <div style="font-size:12px;font-weight:800;letter-spacing:0.5px;color:#a78bfa;margin-bottom:4px;">오행 에너지 지도</div>
+    <div style="font-size:11px;color:#7d789c;margin-bottom:14px;word-break:keep-all;">천간·지지에 더해 지지 속에 숨은 기운(지장간)까지 반영한 분포입니다</div>
+    
+    
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:9px;"><tr>
+      <td width="26" style="font-size:13px;font-weight:800;color:#4ade80;">목</td>
+      <td style="padding:0 8px;">
+        <div style="background:#22222e;border-radius:6px;height:10px;width:100%;">
+          <div style="background:#4caf50;height:10px;border-radius:6px;width:4%;font-size:0;line-height:0;">&nbsp;</div>
+        </div>
+      </td>
+      <td width="42" style="font-size:12px;color:#9a9ab5;text-align:right;">4%</td>
+    </tr></table>
+    
+    
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:9px;"><tr>
+      <td width="26" style="font-size:13px;font-weight:800;color:#f87171;">화</td>
+      <td style="padding:0 8px;">
+        <div style="background:#22222e;border-radius:6px;height:10px;width:100%;">
+          <div style="background:#ff7043;height:10px;border-radius:6px;width:25%;font-size:0;line-height:0;">&nbsp;</div>
+        </div>
+      </td>
+      <td width="42" style="font-size:12px;color:#9a9ab5;text-align:right;">25%</td>
+    </tr></table>
+    
+    
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:9px;"><tr>
+      <td width="26" style="font-size:13px;font-weight:800;color:#fbbf24;">토</td>
+      <td style="padding:0 8px;">
+        <div style="background:#22222e;border-radius:6px;height:10px;width:100%;">
+          <div style="background:#fbbf24;height:10px;border-radius:6px;width:25%;font-size:0;line-height:0;">&nbsp;</div>
+        </div>
+      </td>
+      <td width="42" style="font-size:12px;color:#9a9ab5;text-align:right;">25%</td>
+    </tr></table>
+    
+    
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:9px;"><tr>
+      <td width="26" style="font-size:13px;font-weight:800;color:#e5e7eb;">금</td>
+      <td style="padding:0 8px;">
+        <div style="background:#22222e;border-radius:6px;height:10px;width:100%;">
+          <div style="background:#c4c4cc;height:10px;border-radius:6px;width:33%;font-size:0;line-height:0;">&nbsp;</div>
+        </div>
+      </td>
+      <td width="42" style="font-size:12px;color:#9a9ab5;text-align:right;">33%</td>
+    </tr></table>
+    
+    
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:9px;"><tr>
+      <td width="26" style="font-size:13px;font-weight:800;color:#60a5fa;">수</td>
+      <td style="padding:0 8px;">
+        <div style="background:#22222e;border-radius:6px;height:10px;width:100%;">
+          <div style="background:#42a5f5;height:10px;border-radius:6px;width:12%;font-size:0;line-height:0;">&nbsp;</div>
+        </div>
+      </td>
+      <td width="42" style="font-size:12px;color:#9a9ab5;text-align:right;">12%</td>
+    </tr></table>
+    
+  </div>
+
+  <!-- ── 섹션 1: 핵심 코드 ── -->
+  
+<div style="margin:0 14px 20px;background:#101019;border:1px solid #222231;border-top:3px solid #a78bfa;border-radius:16px;overflow:hidden;">
+  <div style="padding:18px 20px 13px;border-bottom:1px solid #1e1e2b;background:#13131f;">
+    <span style="font-size:17px;font-weight:800;color:#f0ecff;letter-spacing:-0.4px;word-break:keep-all;">인생 핵심 코드</span>
+  </div>
+  <div style="padding:20px;font-size:14.5px;line-height:1.9;color:#cfcfe0;word-break:keep-all;">
+    <p style="margin:0 0 13px;">사주 명식을 처음 마주하는 당신을 환영합니다. 홍길동 님의 본질 에너지는 <span style="color:#ecc65f;font-weight:700;">금</span>입니다. 이는 차곡차곡 쌓아가는 성실함과 소신을 가진 당신의 내면을 보여줍니다. 하지만, 현재 당신은 스스로 조금 약하다고 느낄 수 있습니다. 이는 일종의 선물입니다. 왜냐하면, 그 약함이 오히려 더 깊은 자립과 강한 내면을 키워줄 수 있기 때문입니다.</p>
+<div style="margin:2px 0 16px;padding:13px 16px;background:#191634;border-left:3px solid #a78bfa;border-radius:0 12px 12px 0;"><div style="font-size:10.5px;letter-spacing:1.2px;color:#a78bfa;font-weight:800;margin-bottom:5px;">핵심</div><div style="font-size:15px;font-weight:700;color:#f0ecff;line-height:1.62;">당신의 삶은 소신과 성실함을 중심으로, 스스로를 강하게 만들어가는 여정입니다.</div></div>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">코드 1. 자립과 소신의 흐름</span></div>
+<p style="margin:0 0 13px;">당신은 흔들리지 않는 산 같은 사람입니다. 항상 중심을 잃지 않으려 노력하며, 자신의 소신을 따라가려는 경향이 있습니다. 예를 들어, 친구들이나 주변 사람들이 다른 길을 제안할 때도 자신만의 방향을 고수하는 경우가 많습니다. 그러나 가끔은 이런 소신이 외부와의 융합을 어렵게 만들 수 있습니다. 이럴 때는 그 소신이 어떤 가치를 가지고 있는지 되새기며, <span style="color:#ecc65f;font-weight:700;">당신의 강한 내면을 믿고</span> 유연하게 대처하는 것이 도움이 될 것입니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">코드 2. 도전과 돌파의 에너지</span></div>
+<p style="margin:0 0 13px;">당신의 사주에는 강한 도전 정신이 깃들어 있습니다. 새로운 환경에 도전하고, 어려운 상황을 돌파하는 것을 두려워하지 않는 성향이 있습니다. 이는 직장 생활에서, 새로운 프로젝트나 책임을 맡을 때 특히 빛을 발합니다. 그러나 너무 많은 도전이 때때로 과부하가 될 수 있습니다. 이럴 때는 잠시 멈추고, 현재를 돌이켜보며 <span style="color:#f0a98a;font-weight:700;">균형을 찾는 것이 중요합니다</span>. 이 에너지는 모험을 두려워하지 않게 하지만, 스스로를 지키는 마음도 필요합니다.</p>
+<div style="margin:18px 0;padding:16px 17px;background:#241f12;border:1px solid #6b5a1f;border-radius:14px;"><div style="display:inline-block;font-size:11px;color:#1a1206;background:#fbbf24;font-weight:800;padding:3px 12px;border-radius:20px;margin-bottom:9px;">이거 재밌어요</div><div style="font-size:14.5px;color:#f6ecd6;line-height:1.75;">실제로 당신은 어려운 상황에서도 "어쩌면 이게 나를 더 강하게 만들 거야"라고 생각하는 경향이 있습니다.</div></div>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">코드 3. 표현과 재능의 발현</span></div>
+<p style="margin:0 0 13px;">당신의 명식에는 자기 표현에 대한 강한 기운이 있습니다. 이는 사람들과의 관계에서 톡톡 튀는 매력을 발휘하지만, 때로는 주변 사람들에게 너무 빠르게 다가가서 오해를 사기도 합니다. 예를 들어, 새로운 아이디어를 제안할 때 상대방이 이해하지 못할 경우가 있습니다. 이런 때에는 <span style="color:#5fd6a6;font-weight:700;">자신의 재능을 믿고</span> 좀 더 천천히, 상대의 속도에 맞춰 설명하는 것이 좋습니다. 이는 당신이 가진 특별한 기운을 더 널리 퍼뜨리는 데 큰 힘이 될 것입니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">일간 요약과 따뜻한 한 마디</span></div>
+<p style="margin:0 0 13px;">경(금)의 본질을 가진 홍길동 님은 세상과의 다양한 관계 속에서도 자신의 자리에서 빛나는 성실함을 보여주고 있습니다. 스스로 약하다고 느낄지라도, 그 약함이 오히려 더 큰 내면의 강함으로 자리 잡고 있습니다. 지금까지 이렇게 살아온 것만으로도 충분히 잘해왔습니다.</p>
+<div style="margin:18px 0;padding:15px 17px;background:#161a30;border:1px solid #3a3566;border-radius:14px;"><div style="font-size:10.5px;letter-spacing:0.8px;color:#c4b5fd;font-weight:800;margin-bottom:5px;">무의식 정화 한 스푼</div><div style="font-size:14px;color:#dad5f0;line-height:1.75;">이 패턴을 알아차린 순간, 당신의 삶은 새로운 방향으로 열릴 수 있습니다. 스스로를 믿고, 한 걸음씩 나아가세요. 당신의 길은 당신만의 것입니다.</div></div>
+  </div>
+</div>
+
+  <!-- ── 섹션 1.5 (신규): 격국·용신 ── -->
+  
+<div style="margin:0 14px 20px;background:#101019;border:1px solid #222231;border-top:3px solid #c084fc;border-radius:16px;overflow:hidden;">
+  <div style="padding:18px 20px 13px;border-bottom:1px solid #1e1e2b;background:#13131f;">
+    <span style="font-size:17px;font-weight:800;color:#f0ecff;letter-spacing:-0.4px;word-break:keep-all;">내 사주의 본질 구조와 보충해야 할 에너지</span>
+  </div>
+  <div style="padding:20px;font-size:14.5px;line-height:1.9;color:#cfcfe0;word-break:keep-all;">
+    <p style="margin:0 0 13px;">당신은 어떤 상황에서도 강한 추진력으로 정면 돌파하는 사람입니다. 직장에서 어려운 프로젝트에 직면했을 때, 다른 사람들이 주저할 때도 당신은 먼저 나서서 해결책을 제시합니다. 이런 성향은 친구들이나 가족이 힘들어할 때, 그들에게 든든한 버팀목이 되어줍니다. 무언가를 시작할 때 망설임 없이 전진할 수 있는 능력이 있습니다. 당신은 실패를 두려워하기보다는 새로운 도전에 설레는 타입입니다. 이는 주변 사람들에게 강한 인상을 남기며, 리더로서의 자질을 드러내기도 합니다.</p>
+<div style="margin:2px 0 16px;padding:13px 16px;background:#191634;border-left:3px solid #a78bfa;border-radius:0 12px 12px 0;"><div style="font-size:10.5px;letter-spacing:1.2px;color:#a78bfa;font-weight:800;margin-bottom:5px;">핵심</div><div style="font-size:15px;font-weight:700;color:#f0ecff;line-height:1.62;">당신은 언제나 도전 앞에서 빛나는 존재입니다.</div></div>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">2. 지금 내 에너지 상태 (단단함 vs 보충 필요)</span></div>
+<p style="margin:0 0 13px;">현재 당신의 에너지는 약간 부족한 상태입니다. <span style="color:#ecc65f;font-weight:700;">내 기운이 채워지지 않고</span> 있어, 때로는 중간에 지치는 것을 느낄 수 있습니다. 새로운 도전을 할 때 에너지가 충분히 차오르지 않아 힘겹게 느껴질 수 있습니다. 그래서 지금은 보충이 필요한 시기입니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">3. 채우면 삶이 풀리는 기운</span></div>
+<p style="margin:0 0 13px;">당신에게 필요한 것은 <span style="color:#5fd6a6;font-weight:700;">자립 소신의 기운</span>입니다. 이 기운은 당신이 스스로 결정을 내리고 진행할 때 더욱 확신을 심어줄 수 있습니다. 이를 테면, 새로운 목표를 설정할 때 혼자서도 충분히 해낼 수 있다는 믿음을 주는 기운입니다. 또한, 자립적인 성향은 당신의 창의적인 면을 더 끌어낼 수 있습니다. 이 기운이 채워지면, 당신은 더 이상 외부의 영향에 흔들리지 않고 자기만의 길을 걸을 수 있게 됩니다.</p>
+<div style="margin:18px 0;padding:16px 17px;background:#241f12;border:1px solid #6b5a1f;border-radius:14px;"><div style="display:inline-block;font-size:11px;color:#1a1206;background:#fbbf24;font-weight:800;padding:3px 12px;border-radius:20px;margin-bottom:9px;">이거 재밌어요</div><div style="font-size:14.5px;color:#f6ecd6;line-height:1.75;">흥미로운 점은, 지금 당신에게 필요한 기운이 단순히 채우면 끝나는 것이 아니라, 그 안에서 더 많은 가능성을 발견하게 된다는 것입니다.</div></div>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">4. 잠시 거리를 두면 좋은 것</span></div>
+<p style="margin:0 0 13px;">반대로, 지금 당신에게서 에너지를 소모시키는 것은 <span style="color:#f0a98a;font-weight:700;">경쟁과 승부욕의 기운</span>입니다. 너무 많은 경쟁 속에 있다 보면, 오히려 당신의 에너지가 빠르게 소진될 수 있습니다. 또한, 불필요한 비교나 타인과의 갈등은 피하는 것이 좋습니다. 이런 환경에서는 당신의 본래 추진력이 약해질 수 있습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">5. 생활 속 처방</span></div>
+<p style="margin:0 0 13px;">1. <strong style="color:#efeaff;">색깔</strong>: 블루 계열의 색상을 가까이 두세요. 이는 편안함과 집중력을 높여 줍니다.<br>2. <strong style="color:#efeaff;">방향</strong>: 남동쪽 방향으로 자리를 잡아보세요. 이 방향은 당신의 기운을 보충하는 데 도움이 됩니다.<br>3. <strong style="color:#efeaff;">음식</strong>: 단백질이 풍부한 식단을 유지하세요. 이는 에너지를 꾸준히 공급해 줍니다.<br>4. <strong style="color:#efeaff;">환경</strong>: 녹음이 우거진 공원이나 자연 속에서 시간을 보내는 것이 좋습니다.<br>5. <strong style="color:#efeaff;">활동</strong>: 요가나 명상 같은 활동을 통해 내면의 평화를 찾으세요.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">6. 닫는 위로</span></div>
+<p style="margin:0 0 13px;">당신에게 보충할 기운이 있다는 것은 결핍이 아닌, 새로운 성장의 방향을 가리킵니다. 이런 기운을 알아차리고 채우는 것만으로도, 삶의 흐름은 달라지기 시작합니다. 이미 큰 첫걸음을 내디뎠습니다. 이 순간을 잘 활용해보세요.</p>
+  </div>
+</div>
+
+  <!-- ── 섹션 2: 연애 패턴 ── -->
+  
+<div style="margin:0 14px 20px;background:#101019;border:1px solid #222231;border-top:3px solid #f472b6;border-radius:16px;overflow:hidden;">
+  <div style="padding:18px 20px 13px;border-bottom:1px solid #1e1e2b;background:#13131f;">
+    <span style="font-size:17px;font-weight:800;color:#f0ecff;letter-spacing:-0.4px;word-break:keep-all;">연애와 관계 무의식 패턴</span>
+  </div>
+  <div style="padding:20px;font-size:14.5px;line-height:1.9;color:#cfcfe0;word-break:keep-all;">
+    <p style="margin:0 0 13px;">연애에서 우리가 끌리는 사람은 단순히 취향의 문제가 아닙니다. 그 뒤에는 무의식의 깊은 뿌리가 자리 잡고 있습니다. 그럼 홍길동님의 무의식 연애 패턴을 살펴볼까요?</p>
+<div style="margin:2px 0 16px;padding:13px 16px;background:#191634;border-left:3px solid #a78bfa;border-radius:0 12px 12px 0;"><div style="font-size:10.5px;letter-spacing:1.2px;color:#a78bfa;font-weight:800;margin-bottom:5px;">핵심</div><div style="font-size:15px;font-weight:700;color:#f0ecff;line-height:1.62;">당신은 강한 외형의 사람에게 끌리지만, 그 이면의 부드러움을 원합니다.</div></div>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">끌리는 사람의 패턴</span></div>
+<p style="margin:0 0 13px;">홍길동님은 자립적이고 독립적인 사람에게 끌리는 경향이 있습니다. 이는 사주에서 나타나는 "자립 소신의 기운"이 강하게 작용하기 때문인데요. 이러한 유형의 사람들은 외적으로 매우 강해 보이지만, <span style="color:#ecc65f;font-weight:700;">당신이 진짜 원하는 것은 그 강함 속에 숨은 부드러움</span>입니다. 이처럼 외형과 내면의 균형을 가진 사람을 찾는 이유는 당신 자신도 강한 외면과 깊은 내면을 가진 사람으로서 그와 같은 균형을 이해하고 공감할 수 있기 때문입니다.</p>
+<div style="margin:18px 0;padding:16px 17px;background:#241f12;border:1px solid #6b5a1f;border-radius:14px;"><div style="display:inline-block;font-size:11px;color:#1a1206;background:#fbbf24;font-weight:800;padding:3px 12px;border-radius:20px;margin-bottom:9px;">이거 재밌어요</div><div style="font-size:14.5px;color:#f6ecd6;line-height:1.75;">이는 마치 강철 같은 외형을 가진 꽃을 찾는 것과 같습니다.</div></div>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">관계에서 반복되는 상처</span></div>
+<p style="margin:0 0 13px;">당신은 종종 관계에서 상대방의 기대에 부응해야 한다는 압박을 느낍니다. 이는 "경쟁 승부욕의 기운"과 "도전 압박 돌파의 기운"이 관계 속에서 강하게 작용하기 때문입니다. 상대가 당신에게 끊임없이 무언가를 요구하거나 기대할 때, 당신은 그것을 충족시키려 노력하지만, 때로는 스스로를 잃어버리기도 합니다. 이 과정에서 감정의 소진을 경험하고, 관계를 유지하는 것이 점차 어려워지는 경우가 많습니다. <span style="color:#ecc65f;font-weight:700;">안정과 불안정의 사이에서 균형을 찾는 것</span>이 중요합니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">집착 또는 회피 메커니즘</span></div>
+<p style="margin:0 0 13px;">감정적 위기에서 당신은 때때로 감정적으로 완전히 닫아버리거나, 반대로 모든 것을 다 주려는 경향이 있습니다. 이는 "보살핌 배움 안정의 기운"이 강하게 작용할 때 나타나는 패턴입니다. <span style="color:#ecc65f;font-weight:700;">이런 반응은 당신이 스스로를 보호하기 위한 자연스러운 전략</span>입니다. 과거의 경험으로부터 자신을 지키고자 했던 이러한 메커니즘은 어느 정도 당신을 안전하게 해주었습니다. 하지만 이제는 이 패턴을 알아차림으로써 새로운 선택을 할 수 있습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">이 패턴이 반복되는 진짜 이유</span></div>
+<p style="margin:0 0 13px;">홍길동님이 연애에서 반복하는 패턴의 뿌리는 사주의 "책임 질서 인정의 기운"과 깊게 연결되어 있습니다. 이는 당신이 관계에서 안정과 질서를 찾고자 하는 욕구와 맞물려, 종종 과거의 경험에 얽매이게 만드는 원인으로 작용합니다. 그러나 이 패턴을 알아차린 지금부터는 변화할 수 있습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">연애에서 기억해야 할 한 가지</span></div>
+<p style="margin:0 0 13px;">당신이 관계 속에서 늘 기억해야 할 것은 <span style="color:#ecc65f;font-weight:700;">자신의 중심을 지키는 것</span>입니다. 당신이 가진 부드러움과 강함의 균형은 <span style="color:#5fd6a6;font-weight:700;">당신만의 강점이며, 그 자체로 충분히 매력적입니다</span>. 이번에는 당신 자신에게 집중하세요. <span style="color:#5fd6a6;font-weight:700;">당신은 이미 사랑받을 자격이 충분합니다</span>.</p>
+<div style="margin:18px 0;padding:15px 17px;background:#161a30;border:1px solid #3a3566;border-radius:14px;"><div style="font-size:10.5px;letter-spacing:0.8px;color:#c4b5fd;font-weight:800;margin-bottom:5px;">무의식 정화 한 스푼</div><div style="font-size:14px;color:#dad5f0;line-height:1.75;">이 무의식의 패턴을 알아차린 지금, 앞으로 다가올 사랑은 지금까지와는 다른 모습일 수 있습니다.</div></div>
+  </div>
+</div>
+
+  <!-- ── 섹션 3: 재물 패턴 ── -->
+  
+<div style="margin:0 14px 20px;background:#101019;border:1px solid #222231;border-top:3px solid #fbbf24;border-radius:16px;overflow:hidden;">
+  <div style="padding:18px 20px 13px;border-bottom:1px solid #1e1e2b;background:#13131f;">
+    <span style="font-size:17px;font-weight:800;color:#f0ecff;letter-spacing:-0.4px;word-break:keep-all;">돈이 막히는 진짜 이유</span>
+  </div>
+  <div style="padding:20px;font-size:14.5px;line-height:1.9;color:#cfcfe0;word-break:keep-all;">
+    <p style="margin:0 0 13px;">당신이 돈을 관리하는 방식에는 특별한 패턴이 숨어 있습니다.</p>
+<div style="margin:2px 0 16px;padding:13px 16px;background:#191634;border-left:3px solid #a78bfa;border-radius:0 12px 12px 0;"><div style="font-size:10.5px;letter-spacing:1.2px;color:#a78bfa;font-weight:800;margin-bottom:5px;">핵심</div><div style="font-size:15px;font-weight:700;color:#f0ecff;line-height:1.62;">돈이 들어오면 소신 있게 굴리지만, 그 안에 숨어 있는 불안이 발목을 잡습니다.</div></div>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">이 사람이 돈을 버는 방식</span></div>
+<p style="margin:0 0 13px;">홍길동 님은 <span style="color:#ecc65f;font-weight:700;">안정된 돈의 기운</span>과 함께, 자신의 방식대로 표현하고 활용하는 재능이 있습니다. 이 기운은 당신이 새로운 기회를 발견하고, 그것을 체계적으로 접근하는 능력을 줍니다. 당신은 돈을 벌 때 주로 <span style="color:#ecc65f;font-weight:700;">자립과 소신의 기운</span>을 통해 안정적인 수익을 추구하는 경향이 있습니다. 이는 장기적으로 꾸준히 성장할 수 있는 기반이 됩니다. 또한, 당신은 <span style="color:#5fd6a6;font-weight:700;">크게 굴리는 돈의 기운</span>과 관련된 기회가 찾아오면 이를 놓치지 않고, 과감하게 도전하는 스타일입니다. 이로 인해 다양한 분야에서 수익을 창출할 수 있는 잠재력을 가지고 있습니다.</p>
+<div style="margin:18px 0;padding:16px 17px;background:#241f12;border:1px solid #6b5a1f;border-radius:14px;"><div style="display:inline-block;font-size:11px;color:#1a1206;background:#fbbf24;font-weight:800;padding:3px 12px;border-radius:20px;margin-bottom:9px;">이거 재밌어요</div><div style="font-size:14.5px;color:#f6ecd6;line-height:1.75;">재미있는 점은, 때로는 새로운 도전에 대한 열정이 지나쳐, 돈을 모으기보다 굴리는 데 더 집중하게 된다는 것입니다.</div></div>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">돈이 새는 무의식 패턴</span></div>
+<p style="margin:0 0 13px;">하지만, 돈이 들어오는 만큼 빠져나가는 상황이 반복될 수 있습니다. 당신은 새로운 기회가 보이면 거기에 몰입하고, 그 결과를 빨리 보고 싶어 합니다. 그러나 이 과정에서 너무 많은 에너지를 쏟아버리는 경우가 많습니다. 특히, 경쟁심이 발동해서 불필요한 곳에 돈을 지출하는 경우도 있습니다. 예를 들어, 주변 사람들과의 비교에서 오는 부담이 당신을 자주 지출하게 만들 수 있습니다. 또한, 안정된 기반 대신 새로운 투자에 더 눈길이 가면서, 계획에 없는 지출이 발생할 수 있습니다. 이 모든 것들이 한데 얽혀서, 돈이 모이지 않는 상황을 만들 수 있습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">돈 앞에서 나타나는 무의식 저항</span></div>
+<p style="margin:0 0 13px;">돈을 받을 때, 당신은 때때로 그 가치에 대해 의문을 갖습니다. "내가 이만한 가치가 있나?" 하는 생각이 들 때가 있습니다. 과거의 경험에서 비롯된 이 감정은 자신에 대한 의심을 불러일으킬 수 있습니다. 특히, 더 큰 도전으로 나아갈 때, 이 저항은 발목을 잡습니다. 이는 당신이 성장하는 데 두려움을 느끼게 할 수 있지만, 이는 누구나 겪는 자연스러운 감정입니다. 그럴 때일수록, 자신을 믿고 한 걸음 나아가는 것이 중요합니다. 당신의 가치는 이미 충분하며, 그 가치를 스스로 인정할 때 더 큰 기회를 잡을 수 있습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">재물 에너지를 막는 습관</span></div>
+<p style="margin:0 0 13px;">재물운을 약화시키는 습관 중 하나는 지나친 지출입니다. 새로운 기회를 쫓다 보면, 예산을 초과한 경우도 생기며, 이는 장기적으로 재정적 부담이 될 수 있습니다. 또한, 필요 이상의 물건을 구매하거나, 충동적으로 결정을 내리는 습관도 돈의 흐름을 방해할 수 있습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">돈 흐름을 바꾸기 위해 당장 할 수 있는 것</span></div>
+<p style="margin:0 0 13px;">첫 번째로, 자신이 가진 '자립과 소신의 기운'을 잘 활용하여 작은 목표부터 차근차근 이루어 보세요. 두 번째로, 감정에 휘둘리지 않고 계획적으로 지출하는 습관을 들이세요. 지금까지의 당신을 인정하는 것이 <span style="color:#ecc65f;font-weight:700;">새 흐름의 시작</span>입니다.</p>
+<div style="margin:18px 0;padding:15px 17px;background:#161a30;border:1px solid #3a3566;border-radius:14px;"><div style="font-size:10.5px;letter-spacing:0.8px;color:#c4b5fd;font-weight:800;margin-bottom:5px;">무의식 정화 한 스푼</div><div style="font-size:14px;color:#dad5f0;line-height:1.75;">이 패턴은 평생 가는 게 아닙니다. 뿌리를 한 번 알아차리는 순간, 같은 상황에서 다른 선택이 가능해집니다. 당신의 무의식을 이해하고, 새로운 선택으로 가는 길을 열어가 보세요.</div></div>
+  </div>
+</div>
+
+  <!-- ── 섹션 4: 습관 패턴 ── -->
+  
+<div style="margin:0 14px 20px;background:#101019;border:1px solid #222231;border-top:3px solid #34d399;border-radius:16px;overflow:hidden;">
+  <div style="padding:18px 20px 13px;border-bottom:1px solid #1e1e2b;background:#13131f;">
+    <span style="font-size:17px;font-weight:800;color:#f0ecff;letter-spacing:-0.4px;word-break:keep-all;">알면서도 못 바꾸는 것들</span>
+  </div>
+  <div style="padding:20px;font-size:14.5px;line-height:1.9;color:#cfcfe0;word-break:keep-all;">
+    <p style="margin:0 0 13px;">어쩌면 당신은 늘 같은 곳에서 걸려 넘어지는 느낌이 드실 거예요.</p>
+<div style="margin:2px 0 16px;padding:13px 16px;background:#191634;border-left:3px solid #a78bfa;border-radius:0 12px 12px 0;"><div style="font-size:10.5px;letter-spacing:1.2px;color:#a78bfa;font-weight:800;margin-bottom:5px;">핵심</div><div style="font-size:15px;font-weight:700;color:#f0ecff;line-height:1.62;">당신은 자신을 지키기 위해 벽을 세우지만, 그 벽이 가로막는 건 외부가 아니라 내부의 불안입니다.</div></div>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">자기파괴 사이클</span></div>
+<p style="margin:0 0 13px;">당신은 새로운 기회를 앞두고 머뭇거릴 때가 많습니다. 특히 도전과 압박이 강하게 다가올 때, 스스로를 지키기 위해 무의식적으로 뒤로 물러서는 경향이 있습니다. 상황이 복잡해지면, 오히려 더 많은 생각에 빠지기 때문에 행동이 느려질 수 있습니다. 이럴 때 당신은 직관과 깊은 생각에 머물러 변화의 흐름을 거부하곤 합니다. 결과적으로, 이렇게 기회를 놓치고 난 뒤에는 한숨을 쉬며 자신을 탓하게 됩니다. <span style="color:#ecc65f;font-weight:700;">이 패턴은 자신을 보호하려는 무의식의 방어기제</span>가 작동한 것입니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">변화를 막는 무의식의 작동 방식</span></div>
+<p style="margin:0 0 13px;">당신은 자신을 다잡는 질서와 책임의 기운이 강합니다. 이는 안정감을 주지만, 동시에 새로운 변화를 받아들이는 데 걸림돌이 되기도 합니다. 본질적으로 자립 소신의 기운이 있으면서도, 외부의 도전이 오면 그에 대한 불안이 생기곤 합니다. 그래서 눈앞에 있는 기회를 보지 못하고, 자신의 편안한 공간에 머물고 싶어집니다. 이는 경쟁심과 승부욕이 커져버려 행동보다 생각에 집중하게 만드는 구조에서 기인합니다. 이렇게 무의식 속에서 작동하는 기제가 당신의 변화를 막고 있습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">에너지가 낭비되는 상황</span></div>
+<p style="margin:0 0 13px;">주변의 기대와 압박이 클 때, 당신은 쉽게 피로감을 느낄 수 있습니다. 특히, 여러 사람이 얽힌 복잡한 관계 속에서 자신의 자리를 찾으려 할 때, 당신의 에너지는 지치곤 합니다. 또한, 책임 질서 인정의 기운이 강하게 작용하여, 스스로 맡은 역할을 놓치지 않으려 애쓰다가 에너지를 소진하게 됩니다. 주변의 상황을 계속해서 분석하고 싶은 마음이 커지면서, 자연스럽게 집중력이 흩어질 수도 있습니다. 이렇게 복잡한 상황 속에서 당신의 에너지가 흘러가고 있는 것입니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">이미 갖고 있는 강점</span></div>
+<p style="margin:0 0 13px;">당신은 <span style="color:#5fd6a6;font-weight:700;">직관과 깊은 생각의 기운</span>을 가지고 있어, 남들이 보지 못하는 부분을 잘 파악할 수 있습니다. 이 능력은 당신이 문제를 해결하는 데 중요한 역할을 합니다. 또한, 내재된 자립 소신의 기운은 당신이 혼자서도 충분히 목표를 달성할 수 있는 힘을 줍니다. 어쩌면 그동안 이 부분이 잘 드러나지 않아서 스스로를 과소평가했을 수도 있습니다. 그러나 이 강점은 이미 당신의 내면에 자리하고 있습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">지금 당장 끊어야 할 패턴 한 가지</span></div>
+<p style="margin:0 0 13px;">첫 번째로 실천할 수 있는 변화는, 새로운 기회가 다가올 때 '작게 한 걸음 내딛기'입니다. 작은 성공 경험은 큰 변화를 만들어낼 수 있습니다. 복잡한 생각을 멈추고, <span style="color:#ecc65f;font-weight:700;">한 발 먼저 내딛는 연습</span>을 해보세요.</p>
+<div style="margin:18px 0;padding:15px 17px;background:#161a30;border:1px solid #3a3566;border-radius:14px;"><div style="font-size:10.5px;letter-spacing:0.8px;color:#c4b5fd;font-weight:800;margin-bottom:5px;">무의식 정화 한 스푼</div><div style="font-size:14px;color:#dad5f0;line-height:1.75;">이 패턴을 알아차린 것만으로도 큰 변화의 시작점입니다. 이제는 당신이 스스로를 믿고 한 발짝 나아갈 때입니다.</div></div>
+  </div>
+</div>
+
+  <!-- ── 섹션 4.5 (신규): 직업·적성 + 건강·체질 ── -->
+  
+<div style="margin:0 14px 20px;background:#101019;border:1px solid #222231;border-top:3px solid #5eead4;border-radius:16px;overflow:hidden;">
+  <div style="padding:18px 20px 13px;border-bottom:1px solid #1e1e2b;background:#13131f;">
+    <span style="font-size:17px;font-weight:800;color:#f0ecff;letter-spacing:-0.4px;word-break:keep-all;">직업·적성과 건강·체질 코드</span>
+  </div>
+  <div style="padding:20px;font-size:14.5px;line-height:1.9;color:#cfcfe0;word-break:keep-all;">
+    <p style="margin:0 0 13px;">당신의 직업 선택에 있어, 한 가지 재능이 돋보입니다. 그건 바로 끊임없이 탐구하고, 무엇이든 배우려는 의지입니다.</p>
+<div style="margin:2px 0 16px;padding:13px 16px;background:#191634;border-left:3px solid #a78bfa;border-radius:0 12px 12px 0;"><div style="font-size:10.5px;letter-spacing:1.2px;color:#a78bfa;font-weight:800;margin-bottom:5px;">핵심</div><div style="font-size:15px;font-weight:700;color:#f0ecff;line-height:1.62;"><span style="color:#ecc65f;font-weight:700;">당신은 학문과 연구, 그리고 사람을 돌보는 데서 빛납니다.</span></div></div>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">1. 타고난 적성 영역</span></div>
+<p style="margin:0 0 13px;">당신의 사주 구조는 학문과 연구, 그리고 돌봄의 영역에서 자연스럽게 풀립니다. 자립과 소신을 가진 당신은 어떤 분야에서든 깊이 있는 탐구를 통해 지식을 쌓고, 이를 통해 다른 사람들을 이해하고 지원하는 데 능합니다. 또한, 당신은 책임과 질서를 중요시하며, 자신의 분야에서 인정받기 위해 끊임없이 발전하려는 성향이 강합니다. 이로 인해 교육, 상담, 연구직 같은 분야에서 차별화된 역량을 발휘할 수 있습니다. 특히, 사람을 이해하고 그들의 문제를 해결하는 데 탁월한 능력을 가지고 있습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">2. 잘 맞는 일의 환경</span></div>
+<p style="margin:0 0 13px;">프리랜서보다는 조직 내에서 당신의 장점이 더욱 빛나게 됩니다. 규칙과 질서를 중요시하는 당신은 체계적이고 안정적인 환경에서 더욱 효율적으로 일할 수 있습니다. 주변에 당신의 지식과 경험을 존중하고, 성장할 수 있는 기회를 주는 동료와 상사가 있을 때 성과가 최대화됩니다. 또한, 도전적이지만 지지적인 환경에서 스스로를 더욱 발전시키는 데 큰 동기부여를 받습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">3. 피해야 할 직업 패턴</span></div>
+<p style="margin:0 0 13px;">당신은 지나치게 경직된 직장 문화나, 개인의 창의성을 제한하는 환경에서는 에너지가 빠져나가기 쉽습니다. 과도한 경쟁과 승부욕을 요구하는 직무는 당신에게 부담이 될 수 있으며, 이는 금방 지쳐서 포기하게 만들 수 있습니다. 또한, 자율성이 전혀 없는 환경은 당신의 잠재력을 제한할 수 있으므로 주의가 필요합니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">4. 건강 체질 코드</span></div>
+<p style="margin:0 0 13px;">당신의 건강과 체질을 보면, 금과 토의 에너지가 상대적으로 강하게 작용하는 것을 볼 수 있습니다. 이는 폐와 대장, 비장과 위의 기능이 활발하게 작동할 수 있음을 의미합니다. 그러나 지나친 부담이 걸리면 이들 장부에 과부하가 걸릴 수 있어, 적절한 관리가 필요합니다. 반면, 수의 기운이 조금 부족해 신장과 방광의 건강에 유의해야 합니다. 이 부위의 건강을 유지하기 위해 수분을 충분히 섭취하고, 시원한 색상의 음식을 균형 있게 섭취하는 것이 좋습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">5. 일상 식습관과 운동 가이드</span></div>
+<p style="margin:0 0 13px;">당신에게는 토와 금의 균형을 잘 맞추는 것이 중요합니다. 이러한 균형을 위해 <span style="color:#5fd6a6;font-weight:700;">노란색과 흰색 음식</span>을 섭취하는 것이 도움이 될 수 있습니다. 이러한 음식은 비장과 위장 건강을 돕고, 전반적인 면역력을 강화하는 데 기여할 수 있습니다. 운동으로는 심신의 균형을 맞추는 요가나 필라테스 같은 활동이 적합합니다. 이는 신체의 유연성을 높이고, 마음을 안정시키는 데 도움이 됩니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">6. 닫는 위로</span></div>
+<p style="margin:0 0 13px;">지금까지 자기 적성을 제대로 찾지 못했다고 느꼈더라도 늦은 게 아닙니다. <span style="color:#ecc65f;font-weight:700;">당신의 길은 발견하는 순간부터 시작됩니다.</span> 이 글이 그런 발견의 작은 시작이 되길 바랍니다.</p>
+  </div>
+</div>
+
+  <!-- ── 섹션 5: 합충파해 ── -->
+  
+<div style="margin:0 14px 20px;background:#101019;border:1px solid #222231;border-top:3px solid #f87171;border-radius:16px;overflow:hidden;">
+  <div style="padding:18px 20px 13px;border-bottom:1px solid #1e1e2b;background:#13131f;">
+    <span style="font-size:17px;font-weight:800;color:#f0ecff;letter-spacing:-0.4px;word-break:keep-all;">내 사주에서 충돌하는 에너지</span>
+  </div>
+  <div style="padding:20px;font-size:14.5px;line-height:1.9;color:#cfcfe0;word-break:keep-all;">
+    
+    
+    <p style="font-size:13px;color:#4ade80;margin:0 0 12px;">합(合) 년주-시주 오미합</p>
+    
+    
+    <p style="margin:0 0 13px;">당신의 삶 속에서 어떤 에너지가 충돌하고 있는지 궁금하신가요? 사주를 들여다보면 나를 끌어당기는 힘과 내 안의 긴장, 그리고 방해 요소들이 어떤 방식으로 작용하는지 알 수 있습니다.</p>
+<div style="margin:2px 0 16px;padding:13px 16px;background:#191634;border-left:3px solid #a78bfa;border-radius:0 12px 12px 0;"><div style="font-size:10.5px;letter-spacing:1.2px;color:#a78bfa;font-weight:800;margin-bottom:5px;">핵심</div><div style="font-size:15px;font-weight:700;color:#f0ecff;line-height:1.62;">내면의 갈등은 없어도, 변화에 느린 흐름이 당신의 삶에 안정감을 줍니다.</div></div>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">합(合) - 나를 끌어당기는 에너지</span></div>
+<p style="margin:0 0 13px;">홍길동님의 사주에는 <span style="color:#ecc65f;font-weight:700;">합의 에너지</span>가 없습니다. 이는 곧 <span style="color:#ecc65f;font-weight:700;">독립적인 삶</span>을 의미합니다. 다른 사람이나 외부 환경에 끌려다니지 않고, 스스로의 길을 개척하는 데 익숙한 흐름을 가집니다. 이 점은 종종 의사결정에서 <span style="color:#5fd6a6;font-weight:700;">자립성이 돋보이는 장점</span>으로 작용할 수 있습니다. 하지만 때로는 외부의 협조를 끌어들이는 데 어려움을 느낄 수도 있습니다. 독립적인 흐름은 스스로 해결책을 찾아야 하는 상황에서 더욱 강해지며, 이는 당신을 더 강하게 만들 수 있는 좋은 기회입니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">충(沖) - 내 안의 긴장과 갈등</span></div>
+<p style="margin:0 0 13px;">흥미롭게도, 사주에서 <span style="color:#ecc65f;font-weight:700;">충돌하는 에너지</span>가 없다는 점은 큰 장점입니다. 이는 내면의 불필요한 갈등이 적고, 비교적 안정적인 삶을 이어가게 합니다. 그러나 이로 인해 가끔은 변화에 대한 반응이 느릴 수 있습니다. 새로운 기회가 다가와도 이를 포착하는 데 시간이 걸릴 수 있으며, 이는 당신의 성장을 더디게 할 수 있습니다. 하지만 안정적인 환경에서 발전할 수 있는 시간을 가질 수 있다는 것은 긍정적인 면도 있습니다. 즉, 당신은 변화보다는 안정적인 발전을 선호하는 경향이 있을 수 있습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">파(破)와 해(害) - 생각지 못한 방해</span></div>
+<p style="margin:0 0 13px;">사주에는 <span style="color:#ecc65f;font-weight:700;">파와 해</span>같은 방해 요소가 없습니다. 이는 흐름이 비교적 매끄럽고, 외부에서의 의도치 않은 방해가 적음을 뜻합니다. 일상에서 큰 방해 없이 목표를 향해 나아갈 수 있는 환경이 조성될 가능성이 큽니다. 이 점은 당신에게 있어 큰 자산이 될 수 있으며, 일에 집중할 수 있는 시간을 확보하는 데 도움이 됩니다. 그러나 때로는 작은 자극이나 도전이 부족할 수 있어, 스스로의 한계를 넘어서기 위해 의도적으로 새로운 경험을 찾아나설 필요가 있습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">이 갈등 구조에서 벗어나는 방법</span></div>
+<p style="margin:0 0 13px;">당신이 가진 사주 구조의 장점은 바로 <span style="color:#ecc65f;font-weight:700;">안정성</span>입니다. 이 안정성을 기반으로 새로운 도전을 시도해 보세요. 자신의 상황을 정확히 알고, 변화가 필요한 부분을 조금씩 조정해 나가는 것도 좋은 방법입니다. 변화를 두려워하지 말고, 오히려 새로운 기회로 받아들이는 태도가 필요합니다. 이런 변화를 의식적으로 받아들이는 순간, 당신의 인생은 한층 더 풍요로워질 것입니다. <span style="color:#5fd6a6;font-weight:700;">자신의 안정성을 믿고, 그 위에 새로운 경험을 쌓아가세요</span>—이것이 당신의 성장을 이끌어줄 것입니다.</p>
+  
+  </div>
+</div>
+
+  <!-- ── 섹션 5.5 (신규): 가족·인간관계 자리 해석 ── -->
+  
+<div style="margin:0 14px 20px;background:#101019;border:1px solid #222231;border-top:3px solid #fda4af;border-radius:16px;overflow:hidden;">
+  <div style="padding:18px 20px 13px;border-bottom:1px solid #1e1e2b;background:#13131f;">
+    <span style="font-size:17px;font-weight:800;color:#f0ecff;letter-spacing:-0.4px;word-break:keep-all;">가족과 인간관계 자리 해석</span>
+  </div>
+  <div style="padding:20px;font-size:14.5px;line-height:1.9;color:#cfcfe0;word-break:keep-all;">
+    <p style="margin:0 0 13px;">어린 시절의 기억은 성장을 어떻게 이끌었을까요?</p>
+<div style="margin:2px 0 16px;padding:13px 16px;background:#191634;border-left:3px solid #a78bfa;border-radius:0 12px 12px 0;"><div style="font-size:10.5px;letter-spacing:1.2px;color:#a78bfa;font-weight:800;margin-bottom:5px;">핵심</div><div style="font-size:15px;font-weight:700;color:#f0ecff;line-height:1.62;">당신은 자신의 독립성을 유지하면서도, 가문에서 받은 책임감과 질서를 소중히 여깁니다.</div></div>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">1. 년주(年柱) - 부모 조상의 자리</span></div>
+<p style="margin:0 0 13px;">당신은 어린 시절부터 <span style="color:#ecc65f;font-weight:700;">자립 소신의 기운</span>을 강하게 느끼며 자랐습니다. 부모님은 당신에게 일정한 책임과 질서를 강조했을 가능성이 큽니다. 이는 가정 내에서의 인정과 질서 의식이 강하게 자리 잡히게 했을 것입니다. 이로 인해, 부모님이나 조상들로부터 '책임감 있는 사람'으로 인정받으려는 동기가 강하게 작용했을 것이라 추측됩니다.</p>
+<div style="margin:18px 0;padding:16px 17px;background:#241f12;border:1px solid #6b5a1f;border-radius:14px;"><div style="display:inline-block;font-size:11px;color:#1a1206;background:#fbbf24;font-weight:800;padding:3px 12px;border-radius:20px;margin-bottom:9px;">이거 재밌어요</div><div style="font-size:14.5px;color:#f6ecd6;line-height:1.75;">재밌는 건, 당신이 가문에서 받은 영향이 단순한 규율이 아니라 개인의 독립성을 키우는 자양분이 되었다는 점입니다.</div></div>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">2. 월주(月柱) - 형제 사회의 자리</span></div>
+<p style="margin:0 0 13px;">당신은 사회적 관계에서 <span style="color:#f0a98a;font-weight:700;">경쟁심과 승부욕</span>이 두드러지는 경향이 있습니다. 직장에서나 친구 사이에서도 자신의 위치를 분명히 하고 싶어하는 당신의 모습은 늘 자신을 도전하게 만듭니다. 형제나 또래 그룹 내에서 다소 간의 경합이 일어날 때, 당신은 이를 성장의 발판으로 삼아 경쟁 상황을 즐기는 타입입니다. 그렇지만 이 과정에서 때로는 '돈이나 관계가 분산'될 수 있음을 주의해야 합니다. 이는 당신이 사회 속에서 더욱 안정적인 위치를 찾는 데 도움을 줄 것입니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">3. 일주(日柱) - 나와 배우자의 자리</span></div>
+<p style="margin:0 0 13px;"><span style="color:#5fd6a6;font-weight:700;">직관과 독창성</span>이 뛰어난 당신은 내면 깊이 있는 사람에게 끌리는 경향이 있습니다. 배우자와의 관계에서 당신은 종종 자신의 독창적인 아이디어와 깊은 생각을 공유하고 싶어 합니다. 하지만 배우자가 그 깊이를 충분히 이해하지 못할 때, 다소 외로움을 느낄 수 있습니다. 결혼 생활에서 중요한 것은 배우자와의 정서적 연결과 서로의 독립성을 존중하는 것입니다. 이를 통해 서로가 서로를 이해하고 성장하는 관계를 구축할 수 있습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">4. 시주(時柱) - 자녀 미래 말년의 자리</span></div>
+<p style="margin:0 0 13px;">미래의 자녀와의 관계에서, 당신은 <span style="color:#5fd6a6;font-weight:700;">보살핌과 배움의 기운</span>을 통해 자녀에게 안정감을 주는 데 중점을 둘 것입니다. 또한, 노년기에는 자신의 표현력과 재능을 통해 새로운 활동을 찾아갈 가능성이 큽니다. 이는 자녀와의 관계에서도 더욱 긍정적인 영향을 미칠 수 있습니다. 당신은 노년기에 이르러 더욱 풍요로운 삶을 추구하게 되며, 이는 당신의 자녀에게도 좋은 본보기가 될 것입니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">5. 인간관계 무의식 한 줄 처방</span></div>
+<p style="margin:0 0 13px;">당신은 때로는 자신의 내면 깊은 곳에서 나오는 경향을 숨기고 싶어할지도 모릅니다. 하지만 이제부터는 그 깊이를 드러내고, 주변 사람들과 공유해 보세요. 그러면 당신의 인간관계는 더욱 풍요로워질 것입니다. <span style="color:#f0a98a;font-weight:700;">자신의 진실한 모습을 나누는 순간, 관계가 새롭게 피어날 것입니다.</span></p>
+  </div>
+</div>
+
+  <!-- ── 섹션 6: 대운 ── -->
+  
+<div style="margin:0 14px 20px;background:#101019;border:1px solid #222231;border-top:3px solid #60a5fa;border-radius:16px;overflow:hidden;">
+  <div style="padding:18px 20px 13px;border-bottom:1px solid #1e1e2b;background:#13131f;">
+    <span style="font-size:17px;font-weight:800;color:#f0ecff;letter-spacing:-0.4px;word-break:keep-all;">지금 나는 어느 흐름에 있는가</span>
+  </div>
+  <div style="padding:20px;font-size:14.5px;line-height:1.9;color:#cfcfe0;word-break:keep-all;">
+    
+    <div style="text-align:center;margin-bottom:14px;">
+      <span style="display:inline-block;margin:3px;padding:6px 9px;border-radius:8px;background:#1a1a26;border:1px solid #2a2a3a;font-size:11.5px;color:#cfcfe0;white-space:nowrap;"><span style="color:#8888aa;">7~16</span> <strong style="color:#e8e0ff;">壬午</strong></span><span style="display:inline-block;margin:3px;padding:6px 9px;border-radius:8px;background:#1a1a26;border:1px solid #2a2a3a;font-size:11.5px;color:#cfcfe0;white-space:nowrap;"><span style="color:#8888aa;">17~26</span> <strong style="color:#e8e0ff;">癸未</strong></span><span style="display:inline-block;margin:3px;padding:6px 9px;border-radius:8px;background:#2a2350;border:1px solid #a78bfa;font-size:11.5px;color:#cfcfe0;white-space:nowrap;"><span style="color:#8888aa;">27~36</span> <strong style="color:#e8e0ff;">甲申</strong> <span style="color:#a78bfa;">(현재)</span></span><span style="display:inline-block;margin:3px;padding:6px 9px;border-radius:8px;background:#1a1a26;border:1px solid #2a2a3a;font-size:11.5px;color:#cfcfe0;white-space:nowrap;"><span style="color:#8888aa;">37~46</span> <strong style="color:#e8e0ff;">乙酉</strong></span><span style="display:inline-block;margin:3px;padding:6px 9px;border-radius:8px;background:#1a1a26;border:1px solid #2a2a3a;font-size:11.5px;color:#cfcfe0;white-space:nowrap;"><span style="color:#8888aa;">47~56</span> <strong style="color:#e8e0ff;">丙戌</strong></span><span style="display:inline-block;margin:3px;padding:6px 9px;border-radius:8px;background:#1a1a26;border:1px solid #2a2a3a;font-size:11.5px;color:#cfcfe0;white-space:nowrap;"><span style="color:#8888aa;">57~66</span> <strong style="color:#e8e0ff;">丁亥</strong></span>
+    </div>
+    <p style="margin:0 0 13px;">당신의 현재 삶의 흐름을 결정짓는 큰 기운은 바로 큰 돈과 기회, 그리고 자립과 소신의 에너지입니다.</p>
+<div style="margin:2px 0 16px;padding:13px 16px;background:#191634;border-left:3px solid #a78bfa;border-radius:0 12px 12px 0;"><div style="font-size:10.5px;letter-spacing:1.2px;color:#a78bfa;font-weight:800;margin-bottom:5px;">핵심</div><div style="font-size:15px;font-weight:700;color:#f0ecff;line-height:1.62;">지금은 당신이 큰 기회를 잡고 자립할 수 있는 중요한 시기입니다. 이 시기에는 당신이 가진 자립적 성향이 더욱 두드러지며, 주저 없이 새로운 기회에 도전할 수 있는 용기와 자신감이 요구됩니다. 큰 돈을 굴리는 기운은 당신이 경제적 이익을 크게 늘릴 수 있는 기회가 있음을 의미하며, 이와 동시에 자립과 소신의 기운이 당신이 개인적인 원칙을 지키면서도 성장할 수 있도록 돕습니다. 따라서, 이 시기에는 당신의 방향성이 매우 중요합니다. 기회를 놓치지 않으려면 자신의 능력과 소신을 믿고 적극적으로 움직여야 합니다.</div></div>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">현재 대운의 에너지</span></div>
+<p style="margin:0 0 13px;">이 대운의 중심에는 <span style="color:#ecc65f;font-weight:700;">큰 돈과 기회를 굴리는</span> 기운이 있습니다. 이는 당신이 경제적으로 큰 성과를 낼 수 있는 시기라는 것을 의미합니다. 하지만, 속에서는 자립과 소신의 기운이 흐르고 있어, 당신이 스스로의 원칙을 지키면서도 큰 기회를 놓치지 않으려는 노력이 필요합니다. 이 시기의 주제는 결국 자신의 소신을 지키며 어떻게 큰 기회를 현실로 만들 것인가에 달려 있습니다. 재정적으로 중요한 결정들을 내릴 때, 자신의 직관과 원칙을 기반으로 움직인다면 더욱 큰 성과를 거둘 수 있을 것입니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">이 대운에서 올라오는 무의식</span></div>
+<p style="margin:0 0 13px;">이 시기에는 특히 자립적이고 소신 있는 행동이 강조됩니다. 무의식적으로, 당신은 스스로를 독립적으로 세우고 싶어하는 욕구가 커질 수 있습니다. 이는 때로는 외부와의 충돌로 이어질 수 있지만, 이러한 충돌은 당신의 내면을 더 깊이 이해하고 성장할 수 있는 기회를 제공합니다. 일상 속에서는, 중요한 결정을 내릴 때마다 스스로의 소신을 얼마나 지키고 있는지를 자문하게 될 것입니다. 이런 과정에서 <span style="color:#5fd6a6;font-weight:700;">자신의 직관과 독창성을 발휘</span>하는 것이 중요합니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">이 시기를 잘 보내는 방법</span></div>
+<p style="margin:0 0 13px;">현재 대운의 에너지를 활용하려면, 적극적인 자세와 동시에 균형 감각이 필요합니다. 큰 기회를 잡으려는 욕망이 커질 수 있지만, 그럴수록 자신의 소신과 원칙을 잃지 않는 것이 중요합니다. 이를 위해서는 꾸준한 자기 성찰과 현실적인 계획이 필요합니다. 예를 들어, 새로운 사업이나 투자를 고려할 때, <span style="color:#ecc65f;font-weight:700;">자신의 원칙을 기반으로 한 전략</span>을 세우고 실천해보세요. 또한, 개인적인 원칙을 지키면서도 다른 사람들과의 협력을 통해 시너지를 낼 수 있는 방법을 찾는 것이 좋습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">다음 대운 예고</span></div>
+<p style="margin:0 0 13px;">다음 대운, 을유(乙酉) 시기에는 책임과 질서의 기운이 강해질 것입니다. 이는 당신이 그동안 쌓아온 성과를 더욱 체계적으로 관리하고 발전시킬 수 있는 기회가 될 것입니다. 따라서, 현재 대운에서 얻은 경험과 자원을 바탕으로, 다음 시기를 준비하는 데 힘써야 합니다. 이 시기에 대비하여 자신의 업무나 프로젝트에서 체계적인 시스템을 구축하는 것이 도움이 될 것입니다.</p>
+<div style="margin:18px 0;padding:15px 17px;background:#161a30;border:1px solid #3a3566;border-radius:14px;"><div style="font-size:10.5px;letter-spacing:0.8px;color:#c4b5fd;font-weight:800;margin-bottom:5px;">무의식 정화 한 스푼</div><div style="font-size:14px;color:#dad5f0;line-height:1.75;">이러한 준비는 당신의 삶에 새로운 안정과 성장의 기회를 불러올 것입니다. 무의식을 알아차리고 준비한다면, 당신은 충분히 이 흐름을 활용할 수 있습니다.</div></div>
+  
+  </div>
+</div>
+
+  <!-- ── 섹션 7: 세운 ── -->
+  
+<div style="margin:0 14px 20px;background:#101019;border:1px solid #222231;border-top:3px solid #a78bfa;border-radius:16px;overflow:hidden;">
+  <div style="padding:18px 20px 13px;border-bottom:1px solid #1e1e2b;background:#13131f;">
+    <span style="font-size:17px;font-weight:800;color:#f0ecff;letter-spacing:-0.4px;word-break:keep-all;">2026-2027 무의식 발동 시점</span>
+  </div>
+  <div style="padding:20px;font-size:14.5px;line-height:1.9;color:#cfcfe0;word-break:keep-all;">
+    
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:16px;"><tr>
+      <td width="50%" style="padding-right:6px;vertical-align:top;">
+        <div style="background:#1a1733;border:1px solid #322a5a;border-radius:12px;padding:14px;text-align:center;">
+          <div style="font-size:11px;color:#8888aa;margin-bottom:4px;">2026년</div>
+          <div style="font-size:22px;font-weight:900;color:#c4b5fd;">丙午</div>
+          <div style="font-size:11px;color:#7878aa;margin-top:2px;">병오년</div>
+        </div>
+      </td>
+      <td width="50%" style="padding-left:6px;vertical-align:top;">
+        <div style="background:#101d33;border:1px solid #24395a;border-radius:12px;padding:14px;text-align:center;">
+          <div style="font-size:11px;color:#8888aa;margin-bottom:4px;">2027년</div>
+          <div style="font-size:22px;font-weight:900;color:#93c5fd;">丁未</div>
+          <div style="font-size:11px;color:#7878aa;margin-top:2px;">정미년</div>
+        </div>
+      </td>
+    </tr></table>
+    <div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">2026년 병오년(丙午年) - 이 해의 에너지</span></div>
+<p style="margin:0 0 13px;">2026년, 당신에게 찾아오는 에너지는 마치 산을 오르는 등반과 같습니다. <span style="color:#ecc65f;font-weight:700;">도전 압박 돌파의 기운</span>이 강하게 작용하면서, 스스로의 한계를 시험하고 새로운 목표를 설정하려는 기운이 넘쳐납니다. 이러한 시기에는 특히 규범과 질서를 중시하게 되면서, 조직 내에서 자신의 위치와 책임을 더욱 중요하게 느낄 수 있습니다.</p>
+<div style="margin:2px 0 16px;padding:13px 16px;background:#191634;border-left:3px solid #a78bfa;border-radius:0 12px 12px 0;"><div style="font-size:10.5px;letter-spacing:1.2px;color:#a78bfa;font-weight:800;margin-bottom:5px;">핵심</div><div style="font-size:15px;font-weight:700;color:#f0ecff;line-height:1.62;">이 해에는 도전과 책임이 공존하며, 당신의 잠재력을 발휘할 기회가 넘칩니다. 겉으로 드러나는 힘이 강해지기 때문에, 사회적 역할을 다하는 데 있어 더욱 집중할 수 있습니다.</div></div>
+<p style="margin:0 0 13px;">2026년 흐름이 좋아지는 시기: 이 해의 중반, 특히 6월부터 8월 사이에는 자신의 직관과 창의력을 활용할 기회가 많습니다. 이 시기에는 <span style="color:#5fd6a6;font-weight:700;">자신의 강점을 살려</span> 새로운 프로젝트를 시작하거나 기존의 일을 확장하는 데 좋은 시기입니다.</p>
+<p style="margin:0 0 13px;">2026년 한 호흡 골라야 할 시기: 11월부터 연말까지는 잠시 속도를 줄이고, 이미 진행 중인 일들을 정리하고 마무리하는 데 집중하면 좋습니다. 특히, 과중한 책임이 부담이 될 수 있는 시기이므로, <span style="color:#f0a98a;font-weight:700;">균형 있는 선택</span>이 필요합니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">2027년 정미년(丁未年) - 이 해의 에너지</span></div>
+<p style="margin:0 0 13px;">2027년은 안정과 보살핌의 기운이 중심을 잡는 해입니다. <span style="color:#ecc65f;font-weight:700;">책임 질서</span>와 함께, <span style="color:#ecc65f;font-weight:700;">보살핌 배움</span>의 기운이 조화를 이룹니다. 이 시기에는 주변 사람들과의 관계에서 따뜻한 에너지를 주고받으며, 자신의 성장과 발전에 집중할 수 있습니다. 특히, 배움의 기운이 강해져서 새로운 것을 배우고 익히는 데 유리한 환경이 조성됩니다.</p>
+<div style="margin:18px 0;padding:16px 17px;background:#241f12;border:1px solid #6b5a1f;border-radius:14px;"><div style="display:inline-block;font-size:11px;color:#1a1206;background:#fbbf24;font-weight:800;padding:3px 12px;border-radius:20px;margin-bottom:9px;">이거 재밌어요</div><div style="font-size:14.5px;color:#f6ecd6;line-height:1.75;"><strong style="color:#efeaff;">재미있는 점은, 이 해에는 당신의 내면의 평화가 외적인 성공보다 중요하게 느껴질 수 있다는 것입니다.</strong></div></div>
+<p style="margin:0 0 13px;">2027년 핵심 주제: 이 해의 핵심은 자기 돌봄과 지속 가능한 발전입니다. 새로운 스킬을 배우거나 개인적 목표를 수립하는 데 시간을 투자하는 것이 좋습니다. 무의식적으로 안정과 보살핌을 갈망하는 자신을 발견할 수 있으며, 이를 충족시키기 위한 방법을 찾는 것이 중요합니다. 이 시기를 잘 활용하면, 내적으로 크게 성장할 수 있는 기회가 됩니다.</p>
+<div style="margin:18px 0;padding:15px 17px;background:#161a30;border:1px solid #3a3566;border-radius:14px;"><div style="font-size:10.5px;letter-spacing:0.8px;color:#c4b5fd;font-weight:800;margin-bottom:5px;">무의식 정화 한 스푼</div><div style="font-size:14px;color:#dad5f0;line-height:1.75;">이 두 해를 통해 당신은 그동안의 패턴을 뛰어넘고 새로운 가능성을 열어갈 수 있습니다. 변화는 이미 시작되었습니다. 작지만 중요한 선택들이 당신의 미래를 밝게 만들 것입니다.</div></div>
+  
+  </div>
+</div>
+
+  <!-- ── 섹션 7.5 (신규): 12개월 운세 캘린더 ── -->
+  
+<div style="margin:0 14px 20px;background:#101019;border:1px solid #222231;border-top:3px solid #fdba74;border-radius:16px;overflow:hidden;">
+  <div style="padding:18px 20px 13px;border-bottom:1px solid #1e1e2b;background:#13131f;">
+    <span style="font-size:17px;font-weight:800;color:#f0ecff;letter-spacing:-0.4px;word-break:keep-all;">2026년 월별 무의식 흐름 캘린더</span>
+  </div>
+  <div style="padding:20px;font-size:14.5px;line-height:1.9;color:#cfcfe0;word-break:keep-all;">
+    <p style="margin:0 0 13px;">새해가 시작되면 우리는 새로운 가능성과 함께 또 다른 도전을 맞이합니다. 이 달력은 예언이 아닌, 당신의 내면 에너지를 이해하고 보다 나은 선택을 돕기 위한 안내서입니다.</p>
+<div style="margin:2px 0 16px;padding:13px 16px;background:#191634;border-left:3px solid #a78bfa;border-radius:0 12px 12px 0;"><div style="font-size:10.5px;letter-spacing:1.2px;color:#a78bfa;font-weight:800;margin-bottom:5px;">핵심</div><div style="font-size:15px;font-weight:700;color:#f0ecff;line-height:1.62;"><span style="color:#ecc65f;font-weight:700;">홍길동님</span>은 자신의 내면의 흐름을 잘 이해하면, 외부 환경에 휘둘리지 않고 스스로 길을 개척할 수 있습니다.</div></div>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">1월 - 보살핌과 안정</span></div>
+<p style="margin:0 0 13px;">이 달은 보살핌과 안정의 기운이 겉으로도 속으로도 강합니다. 이 시기에는 주변 사람들과의 관계에서 따뜻함을 느끼고, 스스로에게도 여유를 줄 수 있는 시간이 될 것입니다. 새로운 것을 시작하기보다는 기존의 것들을 다듬고, 정리하는 데 주력하세요. 한편으로는 지나치게 안락함에 빠져서 정체되지 않도록 주의해야 합니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">2월 - 자립과 기회</span></div>
+<p style="margin:0 0 13px;">자립의 기운과 함께 큰 기회를 잡을 수 있는 달입니다. 자신만의 소신을 바탕으로 새로운 프로젝트나 투자를 고려해보세요. 그러나 모든 기회가 안전한 것은 아닙니다. 마음껏 도전하되, 충분한 검토와 계획을 통해 움직이는 것이 중요합니다. 이 시기의 기운을 잘 활용하면 큰 성과를 얻을 수 있습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">3월 - 승부욕과 성실함</span></div>
+<p style="margin:0 0 13px;">경쟁과 승부욕이 강해질 수 있는 달입니다. 이것은 당신의 열정을 끌어올릴 수 있지만, 과도한 경쟁심은 관계에 부정적인 영향을 미칠 수 있습니다. 안정된 돈과 성실의 기운이 바탕이 되어 있으니, 냉정함을 유지하고 차분히 목표를 향해 나아가세요. <span style="color:#5fd6a6;font-weight:700;">일의 성취감을 느낄 수 있는 달이 될 것입니다.</span></p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">4월 - 여유와 직관</span></div>
+<p style="margin:0 0 13px;">이 달에는 여유로운 표현과 깊은 직관이 빛나는 시기입니다. 창의적인 활동이나 취미에 몰두하기에 좋은 시간입니다. 새로운 아이디어가 떠오를 수 있으며, 이를 통해 자신만의 독창성을 발휘할 수 있습니다. 주변의 반응에 휘둘리기보다 스스로의 감각을 믿고 나아가십시오.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">5월 - 재능과 도전</span></div>
+<p style="margin:0 0 13px;">톡톡 튀는 재능과 도전의 기운이 겹쳐져, 평소보다 더 활기차고 도전적인 한 달이 됩니다. 새로운 도전이나 프로젝트에 뛰어들기에 최적의 시기입니다. 그러나 무리한 도전은 자칫 실수로 이어질 수 있으니, 충분한 준비와 계획이 필요합니다. 이 기운은 당신을 더 높은 곳으로 이끌 수 있습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">6월 - 기회와 책임</span></div>
+<p style="margin:0 0 13px;">큰 기회를 굴리는 기운이 책임감과 맞물려 작용합니다. 이 시기에는 중요한 결정이나 사업 제안이 들어올 수 있습니다. 기회를 잘 활용하되, 책임 있는 선택을 하는 것이 중요합니다. <span style="color:#f0a98a;font-weight:700;">자칫 경거망동한 행동은 피해야 합니다.</span> 모든 결정에 있어 신중함을 잃지 않도록 하세요.</p>
+<div style="margin:18px 0;padding:16px 17px;background:#241f12;border:1px solid #6b5a1f;border-radius:14px;"><div style="display:inline-block;font-size:11px;color:#1a1206;background:#fbbf24;font-weight:800;padding:3px 12px;border-radius:20px;margin-bottom:9px;">이거 재밌어요</div><div style="font-size:14.5px;color:#f6ecd6;line-height:1.75;">재밌는 점은, 이번 달에 스스로에게 부여한 책임감이 곧 새로운 기회를 창출한다는 것입니다.</div></div>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">7월 - 성실과 배움</span></div>
+<p style="margin:0 0 13px;">이 달에는 성실하게 쌓아온 것들이 결실을 맺는 시기입니다. 배움과 안정의 기운이 함께하여, 새로운 것을 배우거나 연구하기에 좋습니다. 이 시기에는 꾸준함이 중요합니다. 작은 성취라도 꾸준히 쌓아가다 보면, 어느새 큰 결실로 다가올 것입니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">8월 - 도전과 자립</span></div>
+<p style="margin:0 0 13px;">도전과 자립의 기운이 함께하여, 새로운 모험을 떠나기에 적합합니다. 독립적인 프로젝트나 사업을 시작하기 좋은 시기입니다. 그러나 자칫 자립심이 지나쳐 고립되지 않도록 주의해야 합니다. 주변의 조언을 가볍게 여기지 말고, 열린 마음으로 받아들이는 것이 필요합니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">9월 - 책임과 승부</span></div>
+<p style="margin:0 0 13px;">책임과 질서의 기운이 승부욕과 결합되어, 당신의 주도권을 강화시킵니다. 직장이나 사회적 위치에서 큰 책임을 맡게 될 수 있습니다. 이 시기에는 자신만의 원칙을 지키는 것이 중요합니다. 다만, 지나친 경쟁심으로 관계를 소홀히 하지 않도록 주의하세요.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">10월 - 직관과 독창성</span></div>
+<p style="margin:0 0 13px;">깊은 직관과 독창성이 더욱 부각되는 달입니다. 이 시기는 자신의 내부를 탐구하고, 깊이 있는 통찰을 얻을 수 있는 좋은 기회입니다. 창의적인 아이디어나 프로젝트를 추진하기에 적합하며, 스스로의 내면에 귀 기울이는 시간이 될 것입니다. <span style="color:#ecc65f;font-weight:700;">내면의 소리에 집중하여</span> 새로운 방향을 발견해보세요.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">11월 - 보살핌과 여유</span></div>
+<p style="margin:0 0 13px;">보살핌의 기운이 여유와 결합하여, 애정과 따뜻함이 가득한 달이 됩니다. 주변 사람들과의 관계가 깊어지고, 서로를 이해하는 시간이 될 것입니다. 다만, 지나치게 안락함에 빠져 중요한 일들을 미루지 않도록 주의가 필요합니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">12월 - 자립과 재능</span></div>
+<p style="margin:0 0 13px;">자립과 재능의 기운이 강하게 작용하는 달입니다. 올해의 마무리를 준비하며 자신의 재능을 최대한 발휘할 수 있는 시기입니다. 스스로의 능력을 믿고, 자신감을 가지고 모든 일에 임하면 좋습니다. 이 시기의 경험이 내년을 준비하는 데 큰 도움이 될 것입니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">닫는 말</span></div>
+<p style="margin:0 0 13px;">홍길동님, 2026년은 당신의 내면과 외부의 도전이 잘 어우러지는 한 해가 될 것입니다. 이 흐름을 이해하면, 더 이상 외부의 변화에 휘둘리지 않고 스스로의 길을 만들어 나갈 수 있습니다. 한 걸음 한 걸음씩 나아가면서, <span style="color:#ecc65f;font-weight:700;">당신만의 빛나는 길</span>을 찾아가시길 응원합니다.</p>
+  </div>
+</div>
+
+  <!-- ── 섹션 8: 실행 과제 ── -->
+  
+<div style="margin:0 14px 20px;background:#101019;border:1px solid #222231;border-top:3px solid #4ade80;border-radius:16px;overflow:hidden;">
+  <div style="padding:18px 20px 13px;border-bottom:1px solid #1e1e2b;background:#13131f;">
+    <span style="font-size:17px;font-weight:800;color:#f0ecff;letter-spacing:-0.4px;word-break:keep-all;">이번 달 실행 과제</span>
+  </div>
+  <div style="padding:20px;font-size:14.5px;line-height:1.9;color:#cfcfe0;word-break:keep-all;">
+    <p style="margin:0 0 13px;">혹시 최근에 어떤 결정 앞에서 망설였던 적이 있으신가요? 이번 달은 그 망설임을 기회로 바꿀 수 있는 달입니다. 당신 안의 깊은 생각과 직관이 당신을 더 멀리 데려갈 수 있습니다.</p>
+<div style="margin:2px 0 16px;padding:13px 16px;background:#191634;border-left:3px solid #a78bfa;border-radius:0 12px 12px 0;"><div style="font-size:10.5px;letter-spacing:1.2px;color:#a78bfa;font-weight:800;margin-bottom:5px;">핵심</div><div style="font-size:15px;font-weight:700;color:#f0ecff;line-height:1.62;">이번 달은 당신의 마음 속 깊은 곳에서 오는 직관과 창의력을 드러내는 시기입니다.</div></div>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">해야 할 것 (세 가지)</span></div>
+<p style="margin:0 0 13px;">1. <strong style="color:#efeaff;">새로운 도전 받아들이기</strong><br>이번 달에는 새로운 일이나 프로젝트에 참여해 보세요. 이는 당신에게 <span style="color:#5fd6a6;font-weight:700;">도전 압박 돌파의 기운</span>을 긍정적으로 사용할 기회를 줍니다. 새로운 활력과 자신감을 얻게 될 것입니다.</p>
+<p style="margin:0 0 13px;">2. <strong style="color:#efeaff;">자기 표현 활동 늘리기</strong><br>그림 그리기나 글쓰기 같은 창의적인 활동을 통해 자신의 생각을 표현해 보세요. <strong style="color:#efeaff;">톡톡 튀는 표현 재능의 기운</strong>이 지금 강하니, 다양한 방식으로 자신을 드러내는 것이 큰 도움이 됩니다.</p>
+<p style="margin:0 0 13px;">3. <strong style="color:#efeaff;">시간 관리 계획 세우기</strong><br>일을 차근차근 나누어 시간 계획을 세워보세요. <span style="color:#ecc65f;font-weight:700;">책임 질서 인정의 기운</span>을 활용해 자신의 일정을 체계적으로 관리하면 스트레스를 줄일 수 있습니다.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">하지 말아야 할 것 (두 가지)</span></div>
+<p style="margin:0 0 13px;">1. <strong style="color:#efeaff;">관계에서 지나친 경쟁심 가지기</strong><br>주변 사람들과의 관계에서 지나친 승부욕을 드러내지 않도록 주의하세요. 그래도 그동안 당신은 자신을 지키기 위해 경쟁심을 가졌던 거예요.</p>
+<p style="margin:0 0 13px;">2. <strong style="color:#efeaff;">과도한 분석으로 행동 미루기</strong><br>지나치게 모든 것을 깊게 분석하다가 결정이 늦어질 수 있습니다. 이미 충분히 생각해왔다는 걸 기억하고, 때로는 직관에 따라 움직여보세요.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">관찰해야 할 것 (한 가지)</span></div>
+<p style="margin:0 0 13px;">- <strong style="color:#efeaff;">자신의 결정을 지연시키는 요인</strong><br>어떤 상황에서 결정을 미루는지 스스로를 관찰해 보세요. 그리고 그 순간의 감정이나 생각을 기록하는 것도 도움이 됩니다. <span style="color:#ecc65f;font-weight:700;">자립 소신의 기운</span>이 이끄는 대로 자연스럽게 행동하세요.</p>
+<div style="margin:20px 0 9px;padding-left:11px;border-left:3px solid #8b7fd6;"><span style="font-size:15.5px;font-weight:800;color:#b9a8f0;letter-spacing:-0.2px;line-height:1.5;">이번 달 스스로에게 해주고 싶은 말</span></div>
+<p style="margin:0 0 13px;">당신은 여러 면에서 뛰어난 사람입니다. <span style="color:#ecc65f;font-weight:700;">직관 독창 깊은 생각의 기운</span>을 활용하면 어떤 문제도 창의적으로 해결할 수 있어요. 앞으로의 길이 때로는 막막하게 느껴질 수 있지만, 그 길에서 얻는 성취는 당신 안에 있는 깊은 잠재력을 깨우는 과정입니다. <span style="color:#5fd6a6;font-weight:700;">긍정적인 도전과 자기 표현의 기회를 놓치지 않는다면, 당신은 더 큰 가능성으로 나아갈 것입니다.</span></p>
+<div style="margin:18px 0;padding:16px 17px;background:#241f12;border:1px solid #6b5a1f;border-radius:14px;"><div style="display:inline-block;font-size:11px;color:#1a1206;background:#fbbf24;font-weight:800;padding:3px 12px;border-radius:20px;margin-bottom:9px;">이거 재밌어요</div><div style="font-size:14.5px;color:#f6ecd6;line-height:1.75;">흥미로운 점은, 당신의 강점이 단순한 능력이 아니라 깊은 곳에서 나오는 본능적인 힘이라는 것입니다.</div></div>
+<div style="margin:18px 0;padding:15px 17px;background:#161a30;border:1px solid #3a3566;border-radius:14px;"><div style="font-size:10.5px;letter-spacing:0.8px;color:#c4b5fd;font-weight:800;margin-bottom:5px;">무의식 정화 한 스푼</div><div style="font-size:14px;color:#dad5f0;line-height:1.75;">이제부터 당신은 무의식을 알아차리고, 더 나은 선택으로 삶을 바꿀 수 있습니다. 이 변화를 두려워하지 마세요. 당신은 할 수 있습니다.</div></div>
+  </div>
+</div>
+
+  <!-- ── 섹션 9: 정화 선언문 ── -->
+  
+<div style="margin:0 14px 20px;background:#101019;border:1px solid #222231;border-top:3px solid #c4b5fd;border-radius:16px;overflow:hidden;">
+  <div style="padding:18px 20px 13px;border-bottom:1px solid #1e1e2b;background:#13131f;">
+    <span style="font-size:17px;font-weight:800;color:#f0ecff;letter-spacing:-0.4px;word-break:keep-all;">나만의 정화 선언문</span>
+  </div>
+  <div style="padding:20px;font-size:14.5px;line-height:1.9;color:#cfcfe0;word-break:keep-all;">
+    
+    <div style="background:#160a30;border:1px solid #3a3566;border-radius:16px;padding:26px 22px;font-family:'Nanum Myeongjo','Apple SD Gothic Neo',serif;font-size:14.5px;line-height:2.1;color:#e4def7;text-align:center;">
+      <p style="margin:0 0 13px;">하루의 시작과 끝에서, 이 선언문을 마음에 새기세요. 자신을 위한 든든한 보호막이 될 것입니다.</p>
+<p style="margin:0 0 13px;">나는 내 안의 깊은 직관을 믿습니다.<br>나는 나의 소신과 자립을 소중히 여깁니다.<br>나는 나만의 독창성을 자유롭게 표현합니다.<br>나는 도전 앞에서도 흔들리지 않습니다.<br>나는 넘치는 에너지를 긍정으로 씁니다.<br>나는 관계에서도 균형을 유지합니다.<br>나는 내 삶의 주인이며, 나를 보살핍니다.<br>나는 오늘도 나답게 살아갑니다.</p>
+<p style="margin:0 0 13px;">이 선언문을 매일 아침, 그리고 흔들릴 때마다 소리 내어 읽어보세요. 당신의 삶을 지탱해 줄 것입니다.</p>
+    </div>
+    <div style="margin-top:14px;text-align:center;font-size:11.5px;color:#8b86b8;word-break:keep-all;">마음에 닿는 문장을 캡처해 간직하세요. 매일 아침 한 번, 흔들릴 때 한 번 읽으면 더 단단해집니다.</div>
+  
+  </div>
+</div>
+
+  <!-- ── 닫는 초대 ── -->
+  <div style="margin:0 14px 20px;background:#13101f;border:1px solid #3a3566;border-radius:16px;padding:26px 22px;text-align:center;">
+    <div style="font-family:'Nanum Myeongjo','Apple SD Gothic Neo',serif;font-size:17px;color:#f0ecff;font-weight:800;margin-bottom:10px;line-height:1.5;">패턴을 아는 것은 시작입니다</div>
+    <p style="font-size:13.5px;color:#bdbdda;line-height:1.85;margin:0 0 8px;word-break:keep-all;">이 보고서에 담긴 무의식의 결을 글로 마주한 것만으로도, 홍길동님은 이미 절반의 변화를 시작하셨어요. 같은 패턴을 반복하던 자리에서 한 걸음 물러나 바라볼 수 있게 되었으니까요.</p>
+    <p style="font-size:13.5px;color:#bdbdda;line-height:1.85;margin:0;word-break:keep-all;">그리고 그 패턴을 더 깊이 풀어내고 실제 삶의 흐름까지 바꿔내는 일은, <span style="color:#c4b5fd;font-weight:700;">무의식 정화</span>를 통해 한 분 한 분 함께 해오고 있어요. 준비가 되었을 때, 더 깊은 이야기로 만나요.</p>
+  </div>
+
+  <!-- ── 푸터 ── -->
+  <div style="margin:28px 16px 0;padding:22px 16px;text-align:center;border-top:1px solid #1e1e2b;">
+    <div style="font-size:13px;font-weight:800;color:#a78bfa;margin-bottom:10px;">라이프코드 해커</div>
+    <p style="font-size:11.5px;color:#6b6b86;line-height:1.7;margin:0 0 4px;">이 보고서는 홍길동님을 위해 생성된 개인 맞춤 분석입니다.</p>
+    <p style="font-size:11.5px;color:#6b6b86;line-height:1.7;margin:0;">보고서는 참고용이며, 최종 선택과 결정은 항상 당신이 합니다.</p>
+    <p style="margin-top:10px;font-size:11px;color:#3a3a4a;">라이프코드 해커 | 사주명리와 무의식 정화</p>
+  </div>
+
+</td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>
