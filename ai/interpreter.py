@@ -350,6 +350,11 @@ def _generate_one_section(section_key: str, user_prompt: str, max_tokens: int) -
             return _strip_disallowed_symbols(text)
         except Exception as e:
             last_err = e
+            # 크레딧 소진(insufficient_quota)·인증 오류는 재시도해도 절대 안 풀린다.
+            # 즉시 실패시켜 9분 헛돌이를 막고, 결제 건은 빠르게 자동 환불되게 한다.
+            if _is_fatal_quota(e):
+                log.error(f"섹션 '{section_key}' 치명적 오류(재시도 무의미, 즉시 중단): {e}")
+                raise RuntimeError(f"섹션 '{section_key}' 생성 실패(크레딧/인증): {e}")
             if attempt >= max_attempts - 1:
                 break
             # 429(분당 토큰 한도) 에러는 더 길게 기다렸다 재시도
@@ -363,8 +368,23 @@ def _generate_one_section(section_key: str, user_prompt: str, max_tokens: int) -
     raise RuntimeError(f"섹션 '{section_key}' 생성 실패: {last_err}")
 
 
+def _is_fatal_quota(e: Exception) -> bool:
+    """재시도 무의미한 치명적 오류(크레딧 소진/결제/인증) 판별.
+    insufficient_quota는 429지만 분당 한도가 아니라 계정 잔액 문제라 재시도 불가."""
+    msg = str(e).lower()
+    if 'insufficient_quota' in msg or 'exceeded your current quota' in msg:
+        return True
+    if 'invalid_api_key' in msg or e.__class__.__name__ == 'AuthenticationError':
+        return True
+    if getattr(e, 'status_code', None) == 401:
+        return True
+    return False
+
+
 def _is_rate_limit(e: Exception) -> bool:
-    """OpenAI 429(rate limit) 에러인지 판별"""
+    """OpenAI 429(분당 토큰 한도) 에러인지 판별. insufficient_quota는 제외."""
+    if _is_fatal_quota(e):
+        return False
     if e.__class__.__name__ == 'RateLimitError':
         return True
     if getattr(e, 'status_code', None) == 429:
