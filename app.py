@@ -25,7 +25,7 @@ load_dotenv()
 from saju.calculator import calculate_saju, saju_to_dict
 from ai.interpreter import generate_report_sections, generate_cover_line
 from ai.image_gen import generate_persona_image
-from ai.astro import build_astro_context
+from ai.astro import build_astro_context, build_transit_hook_context
 from email_sender import send_report_email, send_report_link_email, send_notification
 from refund import cancel_payment, get_payment_key_by_order_id
 
@@ -357,19 +357,23 @@ def _build_and_send_report(data: dict, token: str = None):
     )
     saju_data = saju_to_dict(saju_result)
 
-    # ── 기질 보강(출생 차트) 컨텍스트 — 태어난 도시 입력 시. 점성술 용어는 비노출 ──
-    astro_context = ''
+    # ── 기질 보강(출생 차트) + 현재 트랜짓 컨텍스트 ──
+    astro_context    = ''
+    transit_context  = ''
     city = (data.get('city') or '').strip()
     if city:
         try:
             astro_context = build_astro_context(year, month, day, hour, minute, city)
         except Exception as e:
             app.logger.warning(f'기질 보강 생략(오류): {e}')
-            astro_context = ''
+        try:
+            transit_context = build_transit_hook_context(year, month, day, hour, minute, city)
+        except Exception as e:
+            app.logger.warning(f'트랜짓 후킹 생략(오류): {e}')
 
-    # ── GPT 보고서 섹션 생성 ──
+    # ── GPT 보고서 섹션 생성 (15개) ──
     _report_stage('섹션생성', data.get('email'))
-    sections = generate_report_sections(saju_data, astro_context=astro_context)
+    sections = generate_report_sections(saju_data, astro_context=astro_context, transit_context=transit_context)
 
     # ── 사주 상징 이미지 + 표지 헤드라인 (실패해도 보고서는 진행) ──
     _report_stage('이미지생성')
@@ -798,6 +802,7 @@ def _dummy_sections(saju_data: dict) -> dict:
     )
 
     return {
+        'transit_hook': "[AI 스킵] 지금 당신에게 일어나고 있는 일 (트랜짓 팩폭 후킹) 섹션입니다.",
         'intro':        f"[테스트 모드] 원국 {p_str}<br>일간 {il['name']}({il['ohaeng']}) {il['strength_label']}<br>GPT API 키를 입력하면 실제 해석이 생성됩니다.",
         'gyeokguk':     f"[AI 스킵] 격국·용신 섹션입니다.<br>{strength_summary}<br>월령 본기 기준 격국과 신강/신약 기반 용신을 분석합니다.",
         'love':         f"[AI 스킵] 연애 무의식 패턴 섹션입니다.<br>일간 {il['name']}의 관성·재성을 기반으로 분석됩니다.",
@@ -807,10 +812,12 @@ def _dummy_sections(saju_data: dict) -> dict:
         'hapchung':     f"[AI 스킵] 합충파해 섹션입니다.<br>{hapchung_text}",
         'family':       f"[AI 스킵] 가족·인간관계 자리 해석 섹션입니다.<br>년주(부모), 월주(형제·사회), 일주(배우자), 시주(자녀·미래) 자리별 분석.",
         'daewoon':      f"[AI 스킵] 현재 대운: <b>{dw_name}</b> ({dw['start_age']}세부터)",
-        'sewoon':       f"[AI 스킵] 세운 분석입니다.<br>2025 {sw['2025']['name']} / 2026 {sw['2026']['name']}",
-        'calendar':     f"[AI 스킵] 2026년 12개월 월별 캘린더 섹션입니다.<br>각 월의 월주와 일간의 만남을 풀어드립니다.",
+        'sewoon':       f"[AI 스킵] 세운 분석입니다.",
+        'calendar':     f"[AI 스킵] 12개월 월별 캘린더 섹션입니다.",
         'action':       "[AI 스킵] 이번 달 실천 가이드 섹션입니다.",
+        'science':      "[AI 스킵] 왜 이게 맞는가 - 과학적 근거 섹션입니다.",
         'purification': "[AI 스킵] 무의식 정화 선언문 섹션입니다.",
+        'family_hook':  "[AI 스킵] 가족 재구매 후킹 섹션입니다.",
     }
 
 

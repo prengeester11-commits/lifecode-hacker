@@ -54,12 +54,13 @@ SYSTEM_PROMPT = """당신은 '라이프코드 해커'입니다.
   제공된 십신을 절대 스스로 다시 계산하거나 다른 값으로 바꾸지 마세요. 단, 본문엔 위 4번의 쉬운 말로만 표현합니다.
 
 【톤 — 매우 중요】
-8. 다정하고 따뜻한 존댓말. 의뢰인이 자기 모습을 마주하는 데 부담을 느끼지 않도록 합니다.
-9. 부족함이나 약점을 짚을 때는 반드시 "그래서 당신은 이렇게 살아남았습니다"식의 인정과 위로를 함께 적습니다.
-10. 한 섹션을 마치기 전에 반드시 격려나 응원의 한 문장을 자연스럽게 흘려보냅니다.
-   예: "이 패턴을 알아차린 것만으로도 이미 큰 변화의 시작입니다."
-11. "당신의 잘못이 아닙니다", "그럴 만한 이유가 있었습니다" 같은 인정 문장을 적절히 섞습니다.
-12. 거리감 있는 분석가가 아니라, 옆에서 함께 명식을 들여다보는 동행자의 어조로 씁니다.
+8. 친한 친구가 찐으로 솔직하게 말해주는 어조. 팩폭 70%, 위로 30%. 직설적이되 품위 있게.
+   뻔한 위로 문장("괜찮아요", "충분히 잘하고 있어요")은 쓰지 마세요. 식상하고 신뢰를 깎습니다.
+9. 부족함이나 약점을 짚을 때 팩폭을 먼저 치세요. 위로는 마지막에 딱 한 문장만.
+   예: "솔직히 말하면 지금 이 패턴이 당신을 계속 같은 자리에 세워두고 있습니다. 근데 이걸 아는 사람은 드뭅니다."
+10. 한 섹션 마지막에 따뜻한 한 마디를 한 문장만. 과하게 위로하면 신뢰가 떨어집니다.
+11. "당신의 잘못이 아닙니다" 식의 위로는 아껴서 딱 필요한 순간에 한 번만. 남발하면 식상해집니다.
+12. 친한 친구가 진짜로 솔직하게 말해주는 어조. 거리감도 과잉 친절도 아닌, 찐 솔직함.
 
 【몰입·후킹 규칙 — 매우 중요】
 13. 밋밋하면 안 됩니다. 각 섹션은 "와, 이거 내 얘기잖아?" 또는 "어, 이건 의외인데?" 하는
@@ -212,36 +213,40 @@ def _build_saju_context(saju_data: dict) -> str:
 """
 
 
-def generate_report_sections(saju_data: dict, astro_context: str = '') -> dict:
+def generate_report_sections(saju_data: dict, astro_context: str = '', transit_context: str = '') -> dict:
     """
     사주 데이터를 받아 보고서 각 섹션을 GPT로 생성.
-    astro_context: 출생 차트 기반 '기질 보강 데이터'(내부용, 점성술 용어 비노출).
-    Returns: 섹션별 텍스트 딕셔너리
+    astro_context: 출생 차트 기반 기질 보강 데이터 (내부용).
+    transit_context: 현재 트랜짓 기반 현재 상황 후킹 데이터 (첫 섹션 팩폭용).
+    Returns: 섹션별 텍스트 딕셔너리 (총 15개)
     """
     context = _build_saju_context(saju_data)
     if astro_context:
         context = context + '\n' + astro_context
 
-    # 섹션별 프롬프트 정의 (총 13개)
+    # 섹션별 프롬프트 정의 (총 15개 — transit_hook·science·family_hook 신규)
     prompts = [
-        ('intro',        _prompt_intro(context)),
-        ('gyeokguk',     _prompt_gyeokguk(context, saju_data)),
-        ('love',         _prompt_love(context)),
-        ('money',        _prompt_money(context)),
-        ('habit',        _prompt_habit(context)),
-        ('career',       _prompt_career(context)),
-        ('hapchung',     _prompt_hapchung(context)),
-        ('family',       _prompt_family(context)),
-        ('daewoon',      _prompt_daewoon(context, saju_data)),
-        ('sewoon',       _prompt_sewoon(context, saju_data)),
-        ('calendar',     _prompt_calendar(context, saju_data)),
-        ('action',       _prompt_action(context)),
-        ('purification', _prompt_purification(context)),
+        ('transit_hook',  _prompt_transit_hook(context, transit_context)),
+        ('intro',         _prompt_intro(context)),
+        ('gyeokguk',      _prompt_gyeokguk(context, saju_data)),
+        ('love',          _prompt_love(context)),
+        ('money',         _prompt_money(context)),
+        ('habit',         _prompt_habit(context)),
+        ('career',        _prompt_career(context)),
+        ('hapchung',      _prompt_hapchung(context)),
+        ('family',        _prompt_family(context)),
+        ('daewoon',       _prompt_daewoon(context, saju_data)),
+        ('sewoon',        _prompt_sewoon(context, saju_data)),
+        ('calendar',      _prompt_calendar(context, saju_data)),
+        ('action',        _prompt_action(context)),
+        ('science',       _prompt_science(context)),
+        ('purification',  _prompt_purification(context)),
+        ('family_hook',   _prompt_family_hook(context)),
     ]
 
-    long_sections = {'calendar', 'gyeokguk', 'career'}
+    long_sections = {'calendar', 'gyeokguk', 'career', 'science'}
     hope_sections = {'intro', 'love', 'money', 'habit', 'daewoon', 'action'}
-    no_engage = {'purification'}
+    no_engage     = {'purification', 'family_hook'}
 
     def _build_and_run(item):
         section_key, user_prompt = item
@@ -774,6 +779,12 @@ def _prompt_hapchung(context: str) -> str:
 
 **이 갈등 구조에서 벗어나는 방법 (4~6문장)**
 [구체적인 의식화 방법 + 갈등 자체를 부정하지 말고 알아차림으로 풀어주라는 따뜻한 마무리]
+
+**[중간 후킹 — 반드시 포함]**
+섹션 마지막에 독자가 다시 집중하도록 환기 블록을 하나 넣으세요.
+[흥미] 마커를 사용해서: "여기까지 읽으면서 '어, 이거 나 맞는데' 했던 부분이 있을 겁니다.
+그게 바로 무의식이 작동하고 있다는 신호입니다. 패턴을 알아차린 순간부터 선택이 달라집니다."
+이 문구를 그대로 쓰지 말고, 이 섹션 내용과 연결해서 다르게 표현하세요.
 """
 
 
@@ -939,6 +950,116 @@ def _prompt_action(context: str) -> str:
 
 **이번 달 스스로에게 해주고 싶은 말 (4~5문장)**
 [따뜻하고 힘을 주는 문단. 사주 에너지에 맞춰 개인화]
+
+**[끝 후킹 — 반드시 포함]**
+마지막에 이 사람의 가장 강한 무의식 패턴을 딱 한 줄로 다시 쳐주세요.
+예: "결국 당신이 계속 같은 자리에서 멈추는 이유는 하나입니다. [이 사람의 핵심 패턴]."
+팩폭이되 위로가 되는 한 문장. ==골드 강조== 활용.
+"""
+
+
+def _prompt_transit_hook(context: str, transit_ctx: str) -> str:
+    if transit_ctx:
+        hook_data = f"""
+{transit_ctx}
+
+위 【현재 상황 후킹 데이터】를 첫 문단에서 팩폭으로 저격하세요.
+첫 문장부터 "지금 당신 이 상황이죠?" 하고 현재 상황을 직격해야 합니다.
+천체·행성·별자리 용어는 절대 쓰지 말고, "지금 당신을 보면"처럼 자연스럽게."""
+    else:
+        hook_data = """
+이 사람의 현재 대운·세운 에너지를 바탕으로,
+지금 이 사람이 겪고 있을 현실 상황(커리어 막힘 / 관계 소진 / 변화 기로 중 가장 강하게 해당될 것)을
+첫 문단에서 팩폭으로 저격하세요."""
+
+    return f"""{context}
+{hook_data}
+
+이 섹션은 보고서의 첫 페이지입니다. 독자가 첫 문장부터 "어? 이거 내 얘기잖아?" 해야 합니다.
+
+【절대 규칙】
+- 따뜻한 인사·환영 문구 금지. 바로 현재 상황 직격.
+- 두 번째 문단: 이 상황이 우연이 아닌 이유 — 이 사람의 타고난 패턴과 연결.
+- 세 번째 문단: 이 흐름이 언제까지인지, 지금 해야 할 것.
+- 팩폭 70% / 위로 30% 비율 유지.
+
+분량: 약 700~900자.
+
+형식:
+
+## 지금 당신에게 일어나고 있는 일
+
+[첫 문단: 팩폭 저격. 현재 상황을 직접 언급. 2~3문장]
+
+[두 번째 문단: 이 상황이 우연이 아닌 이유. 이 사람의 타고난 패턴과 연결. 3~4문장]
+
+[세 번째 문단: 이 흐름이 언제까지인지, 지금 해야 할 것. 2~3문장]
+
+[마지막 한 줄: 가장 중요한 메시지. ==골드 강조== 활용]
+"""
+
+
+def _prompt_science(context: str) -> str:
+    return f"""{context}
+
+이 섹션은 '왜 이 분석이 맞는가'에 대한 과학적·학문적 근거를 보여주는 페이지입니다.
+독자가 "그냥 운세가 아니구나, 실제 근거가 있구나"라는 신뢰를 갖게 하는 것이 목적입니다.
+팩폭 톤으로 직설적으로 씁니다. "이게 왜 맞는지 알려줄게요" 하는 느낌으로.
+
+분량: 약 900~1100자.
+
+형식:
+
+## 왜 이게 맞는가 - 실제 근거
+
+**여는 말 (1~2문장)**
+[단순한 운세 풀이가 아닌 근거 있는 분석이라는 점을 직설적으로]
+
+**1. 무의식 패턴의 과학 - 칼 융(Carl Jung)의 발견 (5~6문장)**
+[칼 융이 수십 년의 임상 연구에서 발견한 집단무의식과 원형(Archetype) 이론.
+사람이 태어난 환경·시기·구조에 따라 반복되는 심리 패턴이 있다는 것이 정신의학에서 검증됨.
+이것이 명리학이 수천 년간 추적해온 '반복 패턴'과 연결되는 지점임을 구체적으로.]
+
+**2. 사주명리학의 통계적 기반 (4~5문장)**
+[명리학이 수천 년간 수억 명의 데이터에서 반복 검증된 패턴 체계라는 점.
+한국·중국에서 현대 연구자들이 재조명 중인 학문적 움직임.
+패턴의 재현성이 그 신뢰의 근거임을 설명.]
+
+**3. 천체 역학과 생체 리듬 - 실제 과학 (4~5문장)**
+[달의 인력이 조수와 인체 수분(70%)에 실제로 영향을 준다는 과학적 사실.
+태어난 계절·기후가 호르몬 분비와 성격 형성에 미치는 영향에 관한 연구들.
+출생 시간대가 생체리듬과 관련된다는 연구. 점성술·별자리 용어 사용 금지.]
+
+**닫는 말 (2~3문장)**
+[이 모든 근거가 결국 "당신의 패턴을 아는 것이 진짜 변화의 시작"이라는
+이 보고서의 목적과 연결되도록. 팩폭으로 마무리.]
+"""
+
+
+def _prompt_family_hook(context: str) -> str:
+    return f"""{context}
+
+이 섹션은 보고서의 마지막 장입니다. 매우 중요합니다.
+독자가 이 보고서를 끝까지 읽고 나서 자연스럽게 "나 말고도 이걸 알면 좋은 사람이 있는데..."
+하는 생각이 들도록 유도해야 합니다.
+광고처럼 느껴지면 절대 안 됩니다. 감성적이고 자연스럽게.
+
+분량: 약 280~350자.
+
+형식:
+
+## 이 보고서를 읽으면서 누군가의 얼굴이 떠올랐나요?
+
+[여는 문장: 보고서를 끝까지 읽은 독자에게 공감으로 시작. 1~2문장]
+
+[본문: 나를 이해하게 됐을 때 자연스럽게 주변 사람도 이해하고 싶어진다는 맥락.
+보고서를 읽으면서 떠오른 사람(가족, 파트너 등)의 패턴을 알면 관계가 달라진다는 내용.
+3~4문장. 자연스럽게, 강요 없이, 광고 느낌 절대 금지]
+
+[마지막 한 줄: "그 사람의 이야기도 궁금하다면" 식의 부드럽고 여운 있는 마무리]
+
+중요: 이 섹션에는 [핵심] [흥미] [희망] 마커와 ==, ++, ^^ 색강조를 쓰지 마세요. 순수한 문장만.
+HTML 링크나 URL은 넣지 마세요 (템플릿에서 처리합니다).
 """
 
 

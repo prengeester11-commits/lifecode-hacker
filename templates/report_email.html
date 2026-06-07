@@ -541,10 +541,13 @@
   }
 
   /* ── 신규 섹션 색상 테마 ── */
-  .section-gyeokguk .section-header { border-top: 3px solid #c084fc; }
-  .section-career .section-header   { border-top: 3px solid #5eead4; }
-  .section-family .section-header   { border-top: 3px solid #fda4af; }
-  .section-calendar .section-header { border-top: 3px solid #fdba74; }
+  .section-gyeokguk .section-header    { border-top: 3px solid #c084fc; }
+  .section-career .section-header      { border-top: 3px solid #5eead4; }
+  .section-family .section-header      { border-top: 3px solid #fda4af; }
+  .section-calendar .section-header    { border-top: 3px solid #fdba74; }
+  .section-transit .section-header     { border-top: 3px solid #fb923c; }
+  .section-science .section-header     { border-top: 3px solid #38bdf8; }
+  .section-familyhook .section-header  { border-top: 3px solid #e879f9; }
 
   /* ── 표지 페이지 (Gmail 모바일 호환 — table 기반) ── */
   .cover-table {
@@ -880,6 +883,11 @@
     {% endfor %}
   </div>
 
+  <!-- ── 섹션 0: 지금 당신에게 일어나고 있는 일 (트랜짓 팩폭 후킹) ── -->
+  {% if sections.transit_hook %}
+  {% call section('지금 당신에게 일어나고 있는 일', '#fb923c') %}{{ sections.transit_hook | safe }}{% endcall %}
+  {% endif %}
+
   <!-- ── 섹션 1: 핵심 코드 ── -->
   {% call section('인생 핵심 코드', '#a78bfa') %}{{ sections.intro | safe }}{% endcall %}
 
@@ -945,7 +953,12 @@
   <!-- ── 섹션 8: 실행 과제 ── -->
   {% call section('이번 달 실행 과제', '#4ade80') %}{{ sections.action | safe }}{% endcall %}
 
-  <!-- ── 섹션 9: 정화 선언문 ── -->
+  <!-- ── 섹션 9: 왜 이게 맞는가 - 과학적 근거 ── -->
+  {% if sections.science %}
+  {% call section('왜 이게 맞는가 - 실제 근거', '#38bdf8') %}{{ sections.science | safe }}{% endcall %}
+  {% endif %}
+
+  <!-- ── 섹션 10: 정화 선언문 ── -->
   {% call section('나만의 정화 선언문', '#c4b5fd') %}
     <div style="background:#160a30;border:1px solid #3a3566;border-radius:16px;padding:26px 22px;font-family:'Nanum Myeongjo','Apple SD Gothic Neo',serif;font-size:14.5px;line-height:2.1;color:#e4def7;text-align:center;">
       {{ sections.purification | safe }}
@@ -953,12 +966,20 @@
     <div style="margin-top:14px;text-align:center;font-size:11.5px;color:#8b86b8;word-break:keep-all;">마음에 닿는 문장을 캡처해 간직하세요. 매일 아침 한 번, 흔들릴 때 한 번 읽으면 더 단단해집니다.</div>
   {% endcall %}
 
-  <!-- ── 닫는 초대 ── -->
-  <div style="margin:0 14px 20px;background:#13101f;border:1px solid #3a3566;border-radius:16px;padding:26px 22px;text-align:center;">
-    <div style="font-family:'Nanum Myeongjo','Apple SD Gothic Neo',serif;font-size:17px;color:#f0ecff;font-weight:800;margin-bottom:10px;line-height:1.5;">패턴을 아는 것은 시작입니다</div>
-    <p style="font-size:13.5px;color:#bdbdda;line-height:1.85;margin:0 0 8px;word-break:keep-all;">이 보고서에 담긴 무의식의 결을 글로 마주한 것만으로도, {{ name }}님은 이미 절반의 변화를 시작하셨어요. 같은 패턴을 반복하던 자리에서 한 걸음 물러나 바라볼 수 있게 되었으니까요.</p>
-    <p style="font-size:13.5px;color:#bdbdda;line-height:1.85;margin:0;word-break:keep-all;">그리고 그 패턴을 더 깊이 풀어내고 실제 삶의 흐름까지 바꿔내는 일은, <span style="color:#c4b5fd;font-weight:700;">무의식 정화</span>를 통해 한 분 한 분 함께 해오고 있어요. 준비가 되었을 때, 더 깊은 이야기로 만나요.</p>
-  </div>
+  <!-- ── 섹션 11: 가족 재구매 후킹 ── -->
+  {% if sections.family_hook %}
+  {% call section('이 보고서를 읽으면서 누군가의 얼굴이 떠올랐나요?', '#e879f9') %}
+    {{ sections.family_hook | safe }}
+    <div style="text-align:center;margin-top:24px;">
+      <a href="https://dapper-praline-c90ab1.netlify.app"
+         style="display:inline-block;background:linear-gradient(135deg,#e879f9,#a855f7);
+                color:#fff;font-size:15px;font-weight:900;text-decoration:none;
+                border-radius:14px;padding:15px 32px;letter-spacing:-0.2px;">
+        그 사람의 보고서 보러 가기
+      </a>
+    </div>
+  {% endcall %}
+  {% endif %}
 
   <!-- ── 푸터 ── -->
   <div style="margin:28px 16px 0;padding:22px 16px;text-align:center;border-top:1px solid #1e1e2b;">
