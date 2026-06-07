@@ -858,6 +858,18 @@ def report_ready(token):
     return jsonify({'ready': False})
 
 
+@app.route('/api/last-report-status')
+def last_report_status():
+    """[임시 진단] 마지막 백그라운드 보고서 작업의 단계/예외 노출.
+    이메일 발송 등 런타임 실패 지점을 HTTP로 직접 확인하기 위함. 진단 후 제거."""
+    return jsonify({
+        **_LAST_REPORT,
+        'brevo_key_set': bool(os.environ.get('BREVO_API_KEY')),
+        'brevo_sender': os.environ.get('BREVO_SENDER') or os.environ.get('GMAIL_ADDRESS') or '(미설정)',
+        'gmail_set': bool(os.environ.get('GMAIL_ADDRESS')),
+    })
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
