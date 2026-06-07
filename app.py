@@ -813,6 +813,7 @@ def _dummy_sections(saju_data: dict) -> dict:
         'family':       f"[AI 스킵] 가족·인간관계 자리 해석 섹션입니다.<br>년주(부모), 월주(형제·사회), 일주(배우자), 시주(자녀·미래) 자리별 분석.",
         'daewoon':      f"[AI 스킵] 현재 대운: <b>{dw_name}</b> ({dw['start_age']}세부터)",
         'sewoon':       f"[AI 스킵] 세운 분석입니다.",
+        'forecast':     f"[AI 스킵] 올해 분야별 총운세(애정·재물·직업·건강·인간관계) 섹션입니다.",
         'calendar':     f"[AI 스킵] 12개월 월별 캘린더 섹션입니다.",
         'action':       "[AI 스킵] 이번 달 실천 가이드 섹션입니다.",
         'science':      "[AI 스킵] 왜 이게 맞는가 - 과학적 근거 섹션입니다.",

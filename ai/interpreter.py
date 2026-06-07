@@ -237,6 +237,7 @@ def generate_report_sections(saju_data: dict, astro_context: str = '', transit_c
         ('family',        _prompt_family(context)),
         ('daewoon',       _prompt_daewoon(context, saju_data)),
         ('sewoon',        _prompt_sewoon(context, saju_data)),
+        ('forecast',      _prompt_forecast(context, saju_data)),
         ('calendar',      _prompt_calendar(context, saju_data)),
         ('action',        _prompt_action(context)),
         ('science',       _prompt_science(context)),
@@ -244,7 +245,7 @@ def generate_report_sections(saju_data: dict, astro_context: str = '', transit_c
         ('family_hook',   _prompt_family_hook(context)),
     ]
 
-    long_sections = {'calendar', 'gyeokguk', 'career', 'science'}
+    long_sections = {'calendar', 'gyeokguk', 'career', 'science', 'forecast'}
     hope_sections = {'intro', 'love', 'money', 'habit', 'daewoon', 'action'}
     no_engage     = {'purification', 'family_hook'}
 
@@ -900,6 +901,50 @@ def _prompt_sewoon(context: str, saju_data: dict) -> str:
 
 {y2}년 핵심 주제 (3~4문장)
 [이 해에 가장 강하게 작동하는 무의식 주제와 대응 방법]
+"""
+
+
+def _prompt_forecast(context: str, saju_data: dict) -> str:
+    sw = saju_data['sewoon']
+    year = sw['first']['year']
+    name, hanja = sw['first']['name'], sw['first']['name_hanja']
+    s_stem = _sk(sw['first'].get('stem_sipsin', ''))
+    s_branch = _sk(sw['first'].get('branch_sipsin', ''))
+    return f"""{context}
+
+{year}년 한 해의 '분야별 총운세'를 작성해 주세요.
+이 섹션은 운세 보고서의 핵심입니다. 독자가 가장 기대하는 부분이니 구체적이고 또렷하게.
+
+[{year}년({name}년) 기운 — 이미 계산됨. 그대로 사용, 본문엔 쉬운 말로만. 전문용어 금지]
+- {year}년 겉기운 [{s_stem}] · 속기운 [{s_branch}]
+이 기운이 이 사람의 사주와 만나 각 분야에서 어떻게 작용하는지를 근거로 풀어주세요.
+
+분량: 약 1500~1800자. 팩폭 70% / 위로 30% 톤. 초등학생도 이해할 쉬운 말.
+
+형식:
+
+## {year}년 분야별 총운세
+
+**여는 말 (2~3문장)**
+[{year}년이 이 사람에게 전체적으로 어떤 해인지 한 문장으로 정의하고, 솔직하게 분위기를 짚어주기]
+
+**연애·애정운 (4~5문장)**
+[{year}년 연애/관계의 흐름. 솔로면 만남의 가능성과 시기, 커플/기혼이면 관계의 변화. 좋은 시기와 조심할 시기를 구체적인 월이나 계절로. 팩폭 한 스푼.]
+
+**재물·금전운 (4~5문장)**
+[{year}년 돈의 흐름. 수입/지출/투자의 결, 돈이 들어오는 시기와 새는 시기. 구체적으로.]
+
+**직업·사업운 (4~5문장)**
+[{year}년 일/커리어의 흐름. 이직/승진/도전에 좋은 시기, 한 호흡 고를 시기. 구체적으로.]
+
+**건강운 (3~4문장)**
+[{year}년 신경 써야 할 신체 부위와 시기. 오행 균형 기반으로. 공포 언어 금지.]
+
+**인간관계운 (3~4문장)**
+[{year}년 가족/동료/친구 관계의 흐름. 도움 받을 인연과 거리 둘 관계.]
+
+**{year}년 한 줄 정리**
+[핵심] [이 해를 관통하는 가장 중요한 메시지 한 줄. ==골드 강조== 활용]
 """
 
 

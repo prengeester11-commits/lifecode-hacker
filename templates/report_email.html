@@ -548,6 +548,7 @@
   .section-transit .section-header     { border-top: 3px solid #fb923c; }
   .section-science .section-header     { border-top: 3px solid #38bdf8; }
   .section-familyhook .section-header  { border-top: 3px solid #e879f9; }
+  .section-forecast .section-header    { border-top: 3px solid #f0abfc; }
 
   /* ── 표지 페이지 (Gmail 모바일 호환 — table 기반) ── */
   .cover-table {
@@ -946,6 +947,11 @@
     </tr></table>
     {{ sections.sewoon | safe }}
   {% endcall %}
+
+  <!-- ── 섹션 7.3 (신규): 분야별 총운세 ── -->
+  {% if sections.forecast %}
+  {% call section(sewoon.first.year ~ '년 분야별 총운세', '#f0abfc') %}{{ sections.forecast | safe }}{% endcall %}
+  {% endif %}
 
   <!-- ── 섹션 7.5 (신규): 12개월 운세 캘린더 ── -->
   {% call section(sewoon.first.year ~ '년 월별 무의식 흐름 캘린더', '#fdba74') %}{{ sections.calendar | safe }}{% endcall %}
