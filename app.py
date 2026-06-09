@@ -863,11 +863,19 @@ def report_ready(token):
 def last_report_status():
     """[임시 진단] 마지막 백그라운드 보고서 작업의 단계/예외 노출.
     이메일 발송 등 런타임 실패 지점을 HTTP로 직접 확인하기 위함. 진단 후 제거."""
+    tsk = os.environ.get('TOSS_SECRET_KEY', '')
+    tck = os.environ.get('TOSS_CLIENT_KEY', '')
+    def _mode(k):
+        return 'test' if k.startswith('test_') else 'live' if k.startswith('live_') else ('미설정' if not k else 'unknown')
     return jsonify({
         **_LAST_REPORT,
         'brevo_key_set': bool(os.environ.get('BREVO_API_KEY')),
         'brevo_sender': os.environ.get('BREVO_SENDER') or os.environ.get('GMAIL_ADDRESS') or '(미설정)',
         'gmail_set': bool(os.environ.get('GMAIL_ADDRESS')),
+        'toss_secret_mode': _mode(tsk),
+        'toss_client_mode': _mode(tck),
+        'admin_key_set': bool(os.environ.get('ADMIN_KEY')),
+        'free_code_set': bool(os.environ.get('FREE_CODE')),
     })
 
 
