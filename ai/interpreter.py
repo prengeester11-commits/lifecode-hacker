@@ -256,18 +256,15 @@ def generate_report_sections(saju_data: dict, astro_context: str = '', transit_c
         text = _generate_one_section(section_key, full_prompt, max_tokens)
         return section_key, _markdown_to_html(text)
 
-    # 동시 실행 개수 제한: OpenAI 분당 토큰 한도(TPM 30,000)와
-    # Render 무료 플랜 메모리(512MB)를 동시에 넘지 않도록 2개로 제한.
-    # (3개면 피크 토큰/메모리가 한도를 살짝 넘겨 429 또는 OOM 위험)
-    from concurrent.futures import ThreadPoolExecutor, as_completed
+    # 순차 실행: OpenAI 무료 티어 TPM 한도(30,000/분)를 초과하지 않도록 1개씩 처리.
+    # 섹션당 평균 ~5,000토큰이므로 동시 2개만 돼도 분당 50,000+ 토큰 → 429 반복 발생.
+    # 순차 실행 시 약 3~4분 소요 (동시 실행 대비 1분 증가지만 429 없이 안정).
     sections = {}
-    log.info(f'보고서 섹션 생성 시작: {len(prompts)}개 (동시 2)')
-    with ThreadPoolExecutor(max_workers=2) as executor:
-        futures = {executor.submit(_build_and_run, item): item[0] for item in prompts}
-        for future in as_completed(futures):
-            key, html_text = future.result()  # 예외는 그대로 전파 → 자동 환불 트리거
-            sections[key] = html_text
-            log.info(f"섹션 완료: {key} ({len(sections)}/{len(prompts)})")
+    log.info(f'보고서 섹션 생성 시작: {len(prompts)}개 (순차)')
+    for item in prompts:
+        key, html_text = _build_and_run(item)
+        sections[key] = html_text
+        log.info(f"섹션 완료: {key} ({len(sections)}/{len(prompts)})")
 
     log.info('모든 섹션 생성 완료')
     return sections
@@ -360,7 +357,7 @@ def _generate_one_section(section_key: str, user_prompt: str, max_tokens: int) -
                 break
             # 429(분당 토큰 한도) 에러는 더 길게 기다렸다 재시도
             if _is_rate_limit(e):
-                wait = _retry_after_seconds(e) or min(20.0, 4.0 * (attempt + 1))
+                wait = _retry_after_seconds(e) or min(60.0, 12.0 * (attempt + 1))
                 log.warning(f"섹션 '{section_key}' 429 재시도 {attempt+1}/{max_attempts}, {wait:.1f}s 대기")
                 time.sleep(wait)
             else:
